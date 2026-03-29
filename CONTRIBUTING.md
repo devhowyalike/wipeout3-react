@@ -89,6 +89,39 @@ Where possible, efforts were made to convert Flash animations to animated SVGs. 
 - Search [existing issues](https://github.com/devhowyalike/wipeout3-react/issues) before opening a new one.
 - Include clear steps to reproduce, your browser/OS, and any relevant console output.
 
+### Commit Messages
+
+This project uses [Conventional Commits](https://www.conventionalcommits.org/). All commit messages must follow the format:
+
+```
+<type>(<scope>): <short summary>
+```
+
+| Type | When to use |
+|------|-------------|
+| `feat` | New feature |
+| `fix` | Bug fix |
+| `refactor` | Code change that neither fixes a bug nor adds a feature |
+| `style` | Formatting, whitespace — no logic change |
+| `chore` | Build process, deps, tooling, config |
+| `docs` | Documentation only |
+| `perf` | Performance improvement |
+| `ci` | CI/CD changes |
+
+**Examples:**
+
+```
+feat(ship): add boost pad collision detection
+fix(ui): correct lap timer overflow on long races
+chore(deps): update vite to v6
+refactor(audio): extract engine sound manager
+```
+
+- Use lowercase throughout
+- Summary is imperative mood: "add" not "added"
+- Scope is optional but encouraged — use the component or module name
+- Keep summary under 72 characters, no trailing period
+
 ### Submitting a Pull Request
 
 1. Fork the repository and create a branch from `main`.
