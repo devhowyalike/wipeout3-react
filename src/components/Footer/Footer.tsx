@@ -61,7 +61,7 @@ export default function Footer() {
       }`}
     >
       <div className={`w3-app-max-width flex w-full items-end justify-between gap-6 pr-6 ${options.wideCenter ? "mx-auto" : ""}`}>
-        <nav aria-label="Secondary navigation" role="navigation">
+        <nav aria-label="Secondary navigation" role="navigation" className="min-w-0">
           <ul className="flex gap-x-[calc(0.2rem+1px)] gap-y-2">
             <li>
               <div
@@ -83,7 +83,7 @@ export default function Footer() {
             <li className="relative">
               <div
                 aria-label="Navigation type"
-                className="relative uppercase text-[9px] font-extrabold flex pl-1 whitespace-nowrap"
+                className="relative uppercase text-[9px] font-extrabold flex pl-1 whitespace-nowrap overflow-hidden text-ellipsis"
               >
                 <div className="absolute top-[6px] h-full border-l border-footer-nav left-0"></div>
                 {footerTitle || DEFAULT_FOOTER_MENU_TITLE}

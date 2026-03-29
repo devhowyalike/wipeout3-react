@@ -144,3 +144,7 @@ Concerns:
 - The Ruffle Flash emulator is very capable, but may not accurately reproduce the original animation.
 - Browsers may block the Ruffle Flash emulator from loading because it executes external content (due to CSP restrictions, enterprise security policies, browser extensions, etc.).
 - Ruffle requires a large `.wasm` file to be downloaded (approximately 4.5 MB when gzipped), managed by the `RufflePreloader` component. On slower connections, this may cause a delay in rendering the banners.
+
+## Technical Notes
+
+For implementation details see [Technical Notes](TechnicalNotes.md).

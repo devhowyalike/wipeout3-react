@@ -45,11 +45,11 @@ pnpm dev
 
 For full setup instructions — including environment variables and production builds — see [CONTRIBUTING.md](CONTRIBUTING.md).
 
-## About the Project
+<!-- ## About the Project
 
 ### Developer Statement
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. -->
 
 ## Quality of Life Improvements
 

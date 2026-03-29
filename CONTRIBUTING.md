@@ -59,29 +59,6 @@ pnpm build
 pnpm lint
 ```
 
-## Technical Notes
-
-### Critical CSS Injection
-
-To prevent a flash of unstyled content (FOUC) when the page first loads, a `<style>` block is injected into the `<head>` of `index.html` at transform time by the `injectCriticalThemeCSS` Vite plugin defined in `vite.config.ts`.
-
-The plugin runs during both `pnpm dev` and `pnpm build`. It reads two source files at transform time to derive the injected styles:
-
-| Source                    | What is read                                                        |
-| ------------------------- | ------------------------------------------------------------------- |
-| `src/styles/index.css`    | `--color-page-bg` value for every `[data-theme]` selector           |
-| `src/config/constants.ts` | `DEFAULT_THEME` identifier, used to set `:root { --color-page-bg }` |
-
-The resolved CSS is injected as a `<style>` tag prepended to `<head>`. It contains per-theme background color rules, `body { background-color: var(--color-page-bg) }`, `#root { visibility: hidden }` (so the page is invisible until the full CSS bundle arrives), and the critical `@font-face` declaration for the Wipeout3 font.
-
-Because the values are derived from the actual CSS and constants files, adding or modifying a theme in `index.css` is automatically reflected in the injected block with no manual updates required.
-
-### Converting Complex Flash Animations
-
-#### SVGs
-
-Where possible, efforts were made to convert Flash animations to animated SVGs. These maintain the vector nature of the original animation, are easy to work with and make interactive, and remain accessible in modern browsers. This applies to pages such as the Teams landing page and Tracks, for example.
-
 ## How to Contribute
 
 ### Reporting Issues
@@ -97,16 +74,16 @@ This project uses [Conventional Commits](https://www.conventionalcommits.org/). 
 <type>(<scope>): <short summary>
 ```
 
-| Type | When to use |
-|------|-------------|
-| `feat` | New feature |
-| `fix` | Bug fix |
+| Type       | When to use                                             |
+| ---------- | ------------------------------------------------------- |
+| `feat`     | New feature                                             |
+| `fix`      | Bug fix                                                 |
 | `refactor` | Code change that neither fixes a bug nor adds a feature |
-| `style` | Formatting, whitespace — no logic change |
-| `chore` | Build process, deps, tooling, config |
-| `docs` | Documentation only |
-| `perf` | Performance improvement |
-| `ci` | CI/CD changes |
+| `style`    | Formatting, whitespace — no logic change                |
+| `chore`    | Build process, deps, tooling, config                    |
+| `docs`     | Documentation only                                      |
+| `perf`     | Performance improvement                                 |
+| `ci`       | CI/CD changes                                           |
 
 **Examples:**
 
@@ -136,3 +113,7 @@ refactor(audio): extract engine sound manager
 - Follow the existing naming and file structure conventions.
 - Accessibility matters — preserve or improve `aria` attributes, keyboard navigation, and `prefers-reduced-motion` support when touching relevant components.
 - Do not commit `.env` files or build artifacts.
+
+## Technical Notes
+
+For implementation details see [Technical Notes](docs/TechnicalNotes.md).

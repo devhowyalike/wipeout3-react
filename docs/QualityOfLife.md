@@ -1,6 +1,8 @@
 # Quality of Life Improvements
 
-wipeout3.com: React Edition includes a number of quality of life improvements over the original Flash website. Most improvements are built in and always active. Where a change represents an opinionated departure from the original Flash experience, it is configurable via the [Options](OPTIONS.md) menu, allowing users to tailor the experience to their preferences or restore the original behavior.
+wipeout3.com: React Edition includes a number of quality of life improvements over the original Flash website.
+
+Most improvements are enabled by default. Where a change represents an opinionated departure from the original Flash experience, it is configurable via the [Options](OPTIONS.md) menu, allowing users to tailor the experience to their preferences or restore the original behavior.
 
 ## General
 
@@ -8,7 +10,7 @@ wipeout3.com: React Edition includes a number of quality of life improvements ov
   - Added support for mobile devices & multiple screen resolutions (also known as Responsive Web Design).
   - Added optional touch hover animations to menu links
     - On touch devices, the first tap on a menu link previews the hover animation and highlights the link text. A second tap confirms and navigates.
-    - This is an opinionated departure from the standard single-tap-to-navigate convention. It is enabled by default but can be opted out of via the [Options](OPTIONS.md) menu.
+    - This is an opinionated departure from the standard single-tap-to-navigate convention. It is enabled by default and controlled via the `touchHover` prop on `Menu`. This prop is not currently exposed as a user-configurable option in the Options menu.
 
 - Accessibility
   - Added a sound toggle button in the footer.
@@ -99,3 +101,7 @@ wipeout3.com: React Edition includes a number of quality of life improvements ov
 - Teams
   - Individual team pages currently display an "under construction" notice styled after actual internal fax transmissions sent by The Designers Republic to Psygnosis during _Wipeout_'s production.
   - The original team pages are among the more complex sections of the Flash website to adapt, so full implementations have been added to the roadmap for a later update.
+
+## Technical Notes
+
+For implementation details see [Technical Notes](TechnicalNotes.md).
