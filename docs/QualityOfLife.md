@@ -101,3 +101,7 @@ Most improvements are enabled by default. Where a change represents an opinionat
 - Teams
   - Individual team pages currently display an "under construction" notice styled after actual internal fax transmissions sent by The Designers Republic to Psygnosis during _Wipeout_'s production.
   - The original team pages are among the more complex sections of the Flash website to adapt, so full implementations have been added to the roadmap for a later update.
+
+## Technical Notes
+
+For implementation details see [Technical Notes](TechnicalNotes.md).
