@@ -8,7 +8,7 @@ wipeout3.com: React Edition includes a number of quality of life improvements ov
   - Added support for mobile devices & multiple screen resolutions (also known as Responsive Web Design).
   - Added optional touch hover animations to menu links
     - On touch devices, the first tap on a menu link previews the hover animation and highlights the link text. A second tap confirms and navigates.
-    - This is an opinionated departure from the standard single-tap-to-navigate convention. It is enabled by default but can be opted out of via the [Options](OPTIONS.md) menu.
+    - This is an opinionated departure from the standard single-tap-to-navigate convention. It is enabled by default and controlled via the `touchHover` prop on `Menu`. This prop is not currently exposed as a user-configurable option in the Options menu.
 
 - Accessibility
   - Added a sound toggle button in the footer.
