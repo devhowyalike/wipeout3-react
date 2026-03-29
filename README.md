@@ -70,6 +70,10 @@ For the full options reference, see [Options](docs/OPTIONS.md).
 
 > **Note:** Sound effects are subject to browser autoplay policies and will not play until the user first interacts with the page. See [Sound & Autoplay](docs/OPTIONS.md#sound--autoplay) in the options reference.
 
+## Technical Notes
+
+For implementation details — including the critical CSS injection strategy, SVG-to-video conversion pipeline, and Flash animation approach — see [Technical Notes](docs/TechnicalNotes.md).
+
 ## Work in Progress
 
 The following pages are incomplete due to the complexity of their animations, and are actively in progress:
