@@ -8,9 +8,12 @@ Most improvements are enabled by default. Where a change represents an opinionat
 
 - Mobile-enhanced
   - Added support for mobile devices & multiple screen resolutions (also known as Responsive Web Design).
-  - Added optional touch hover animations to menu links
-    - On touch devices, the first tap on a menu link previews the hover animation and highlights the link text. A second tap confirms and navigates.
-    - This is an opinionated departure from the standard single-tap-to-navigate convention. It is enabled by default and controlled via the `touchHover` prop on `Menu`. This prop is not currently exposed as a user-configurable option in the Options menu.
+  - Added hover animations to menu links
+    - On desktop, animations play on hover and stop on mouse leave.
+    - On touch devices, two modes are available (see [Technical Notes](TechnicalNotes.md#touch-navigation-modes) for implementation details):
+      - **Wait-for-animation** (default) — tapping a menu link plays the hover animation; navigation fires automatically when the clip finishes.
+        - Tapping the same link a second time while the animation is still playing skips the remainder and navigates immediately.
+      - **Immediate** — taps navigate instantly with no animation. Active when the [`disableHoverAnimations`](OPTIONS.md#disablehoveranimations) option is enabled or `prefers-reduced-motion` is set.
 
 - Accessibility
   - Added a sound toggle button in the footer.

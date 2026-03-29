@@ -9,12 +9,11 @@ import { useState, cloneElement, isValidElement, useEffect, useRef } from "react
  * Primary navigation: {@link WipeoutLink} items, optional route prefetch, modal content with history.
  * Pushes a synthetic history entry when a modal opens so the back button closes it first.
  */
-export default function Menu({ items, prefetch = true, touchHover = true }: MenuProps) {
+export default function Menu({ items, prefetch = true }: MenuProps) {
   // Aliased to avoid shadowing the remapL utility function import
   const { remapL: remapLEnabled } = useOptions();
   const [currentModalContent, setCurrentModalContent] =
     useState<React.ReactNode | null>(null);
-  const [activePreviewId, setActivePreviewId] = useState<string | null>(null);
   // Tracks whether we pushed a synthetic history entry when a modal opened,
   // so we know whether to pop it on close and whether a popstate event
   // belongs to us rather than genuine page navigation.
@@ -57,11 +56,7 @@ export default function Menu({ items, prefetch = true, touchHover = true }: Menu
           as="button"
           className={commonStyles}
           animation={item.animation}
-          touchHover={touchHover}
-          onPreviewStart={() => setActivePreviewId(item.id)}
-          isActivePreview={activePreviewId === item.id}
           onClick={() => {
-            setActivePreviewId(null);
             setCurrentModalContent(null);
             setTimeout(() => {
               if (
@@ -106,9 +101,6 @@ export default function Menu({ items, prefetch = true, touchHover = true }: Menu
         to={item.path}
         className={commonStyles}
         animation={item.animation}
-        touchHover={touchHover}
-        onPreviewStart={() => setActivePreviewId(item.id)}
-        isActivePreview={activePreviewId === item.id}
       >
         {remapL(item.label, remapLEnabled)}
       </WipeoutLink>

@@ -7,9 +7,10 @@ import {
   useCallback,
   MouseEvent,
 } from "react";
-import { Link, LinkProps } from "react-router-dom";
+import { Link, LinkProps, useNavigate } from "react-router-dom";
 import { useUISounds } from "@/hooks/useUISounds";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
+import { useOptions } from "@/hooks/useOptions";
 import { soundManager } from "@/utils/soundManager";
 import { animations, AnimationId } from "./animations";
 import { HoverAnimation } from "./HoverAnimation";
@@ -21,26 +22,6 @@ type WipeoutLinkBaseProps = {
   className?: string;
   animation?: AnimationId;
   onClick?: (event: MouseEvent<HTMLAnchorElement | HTMLButtonElement>) => void;
-  /**
-   * EXPERIMENTAL — Fundamentally changes the touch UX to a two-tap system.
-   *
-   * When `true`, the first tap on a touch device shows the hover animation and
-   * highlights the link; a second tap on the same item navigates. This is an
-   * opinionated departure from the standard tap-to-navigate convention and may
-   * surprise users who expect a single tap to follow a link.
-   *
-   * When `false`, taps navigate immediately and hover animations are not
-   * triggered on touch. Defaults to `true`.
-   */
-  touchHover?: boolean;
-  /** Called when this item enters touch-preview mode (first tap). */
-  onPreviewStart?: () => void;
-  /**
-   * Controlled by the parent to coordinate which item is previewing.
-   * Set to `false` to force-dismiss this item's preview (e.g. when
-   * another item starts previewing).
-   */
-  isActivePreview?: boolean;
 };
 
 type WipeoutLinkAsLink = WipeoutLinkBaseProps & {
@@ -56,7 +37,11 @@ type WipeoutLinkAsButton = WipeoutLinkBaseProps & {
 type WipeoutLinkProps = WipeoutLinkAsLink | WipeoutLinkAsButton;
 
 /**
- * Navigation link (or button) with optional hover animation clips, UI sounds, and a two-tap touch preview mode.
+ * Navigation link (or button) with optional hover animation clips and UI sounds.
+ *
+ * Touch behaviour has two modes:
+ * 1. **Wait-for-animation** (default) — tap plays the animation, navigates when it ends. A second tap skips to navigate immediately.
+ * 2. **Immediate** (`disableHoverAnimations` option or `prefers-reduced-motion`) — tap navigates instantly; no animation is loaded.
  */
 export const WipeoutLink: FC<WipeoutLinkProps> = ({
   as = "link",
@@ -64,70 +49,38 @@ export const WipeoutLink: FC<WipeoutLinkProps> = ({
   className,
   animation,
   onClick,
-  touchHover = true,
-  onPreviewStart,
-  isActivePreview,
   ...props
 }) => {
   const [showAnimation, setShowAnimation] = useState(false);
-  const [isPreviewing, setIsPreviewing] = useState(false);
-  const linkRef = useRef<HTMLDivElement>(null);
+  const [isWaitingForAnimation, setIsWaitingForAnimation] = useState(false);
   const touchOriginatedRef = useRef(false);
+  const pendingNavRef = useRef<(() => void) | null>(null);
+  // Always-current refs so the deferred callback reads the latest props rather
+  // than a closure snapshot captured at tap time.
+  const onClickRef = useRef(onClick);
+  onClickRef.current = onClick;
+  const toRef = useRef<string | undefined>(
+    as === "link" ? (props.to as string) : undefined
+  );
+  toRef.current = as === "link" ? (props.to as string) : undefined;
   const animationData = animation ? animations[animation] : undefined;
   const reducedMotion = useReducedMotion();
+  const { disableHoverAnimations } = useOptions();
+  const navigate = useNavigate();
 
   const { playHoverSound, playClickSound } = useUISounds();
 
-  const dismissPreview = useCallback(() => {
-    setIsPreviewing(false);
-    setShowAnimation(false);
-  }, []);
-
-  // Applied on the first tap (touch preview mode) to visually highlight the link,
-  // signalling to the user that a second tap is needed to navigate.
-  const previewStyle = { color: "var(--color-nav-hover)" } as const;
-
-  // Dismiss when the parent signals another item took over the preview slot
-  useEffect(() => {
-    if (isActivePreview === false && isPreviewing) {
-      dismissPreview();
-    }
-  }, [isActivePreview, isPreviewing, dismissPreview]);
-
-  // Outside-click and scroll dismissal while previewing
-  useEffect(() => {
-    if (!isPreviewing) return;
-
-    const handleOutsideClick = (e: globalThis.MouseEvent) => {
-      if (linkRef.current && !linkRef.current.contains(e.target as Node)) {
-        dismissPreview();
-      }
-    };
-
-    const handleScroll = () => dismissPreview();
-
-    // Defer registration so we don't catch the tap that started the preview
-    const frameId = requestAnimationFrame(() => {
-      document.addEventListener("click", handleOutsideClick);
-      window.addEventListener("scroll", handleScroll, { passive: true });
-    });
-
-    return () => {
-      cancelAnimationFrame(frameId);
-      document.removeEventListener("click", handleOutsideClick);
-      window.removeEventListener("scroll", handleScroll);
-    };
-  }, [isPreviewing, dismissPreview]);
+  const activeStyle = { color: "var(--color-nav-hover)" } as const;
 
   const handleHover = () => {
-    if (isPreviewing) return;
-    if (touchOriginatedRef.current && !touchHover) return;
+    if (touchOriginatedRef.current) return;
     playHoverSound();
+    if (disableHoverAnimations) return;
     setShowAnimation(true);
   };
 
   const handleMouseLeave = () => {
-    if (isPreviewing) return;
+    if (pendingNavRef.current) return;
     setShowAnimation(false);
   };
 
@@ -135,32 +88,62 @@ export const WipeoutLink: FC<WipeoutLinkProps> = ({
     touchOriginatedRef.current = true;
   };
 
+  const handleAnimationEnded = useCallback(() => {
+    setIsWaitingForAnimation(false);
+    setShowAnimation(false);
+    pendingNavRef.current?.();
+    pendingNavRef.current = null;
+  }, []);
+
+  // When disableHoverAnimations is toggled on while the animation is mid-play,
+  // HoverAnimation returns null and unmounts the <video> without firing onEnded.
+  // Flush the pending navigation here so the component doesn't stay stuck.
+  useEffect(() => {
+    if (disableHoverAnimations && pendingNavRef.current) {
+      setIsWaitingForAnimation(false);
+      setShowAnimation(false);
+      const nav = pendingNavRef.current;
+      pendingNavRef.current = null;
+      nav();
+    }
+  }, [disableHoverAnimations]);
+
   const handleClick = (
     e: MouseEvent<HTMLAnchorElement | HTMLButtonElement>
   ) => {
-    if (touchOriginatedRef.current && touchHover && !reducedMotion) {
-      touchOriginatedRef.current = false;
-
-      if (!isPreviewing) {
-        e.preventDefault();
-        setIsPreviewing(true);
-        setShowAnimation(true);
-        playHoverSound();
-        onPreviewStart?.();
-        return;
-      }
-
-      // Second tap: navigate / fire action
-      dismissPreview();
-      playClickSound();
-      soundManager.lockForNavigation();
-      onClick?.(e);
+    // Early exit — second tap while animation is mid-play: navigate immediately
+    if (isWaitingForAnimation && pendingNavRef.current) {
+      e.preventDefault();
+      setIsWaitingForAnimation(false);
+      setShowAnimation(false);
+      const nav = pendingNavRef.current;
+      pendingNavRef.current = null;
+      nav();
       return;
     }
 
-    // Desktop click, or touch without animation, or reduced-motion active.
-    // Stop any in-progress hover animation immediately rather than letting it
-    // run to completion while a modal or new page is already open/loading.
+    // Branch 1 — Wait-for-animation (default touch mode when animations are enabled)
+    if (
+      touchOriginatedRef.current &&
+      !reducedMotion &&
+      !disableHoverAnimations &&
+      animationData
+    ) {
+      touchOriginatedRef.current = false;
+      e.preventDefault();
+      setIsWaitingForAnimation(true);
+      pendingNavRef.current = () => {
+        playClickSound();
+        soundManager.lockForNavigation();
+        if (toRef.current) navigate(toRef.current);
+        onClickRef.current?.(e);
+      };
+      playHoverSound();
+      setShowAnimation(true);
+      return;
+    }
+
+    // Branch 2 — Immediate (desktop click, disabled animations, reduced motion, or no animation data)
     setShowAnimation(false);
     playClickSound();
     if (touchOriginatedRef.current) {
@@ -172,18 +155,21 @@ export const WipeoutLink: FC<WipeoutLinkProps> = ({
 
   return (
     <div
-      ref={linkRef}
       className="inline-block text-w3-fluid-xl"
       onMouseEnter={handleHover}
       onMouseLeave={handleMouseLeave}
     >
-      <HoverAnimation animationData={animationData} isVisible={showAnimation} />
+      <HoverAnimation
+        animationData={disableHoverAnimations ? undefined : animationData}
+        isVisible={showAnimation}
+        onEnded={handleAnimationEnded}
+      />
       {as === "link" ? (
         <Link
           {...(props as LinkProps)}
           to={props.to as string}
           className={className}
-          style={isPreviewing ? previewStyle : undefined}
+          style={isWaitingForAnimation ? activeStyle : undefined}
           onTouchStart={handleTouchStart}
           onClick={handleClick}
           tabIndex={0}
@@ -194,7 +180,7 @@ export const WipeoutLink: FC<WipeoutLinkProps> = ({
         <button
           {...(props as ButtonProps)}
           className={className}
-          style={isPreviewing ? previewStyle : undefined}
+          style={isWaitingForAnimation ? activeStyle : undefined}
           onTouchStart={handleTouchStart}
           onClick={handleClick}
           tabIndex={0}
