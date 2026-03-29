@@ -15,6 +15,14 @@ The resolved CSS is injected as a `<style>` tag prepended to `<head>`. It contai
 
 Because the values are derived from the actual CSS and constants files, adding or modifying a theme in `index.css` is automatically reflected in the injected block with no manual updates required.
 
+## Converting Complex Flash Animations
+
+### SVGs
+
+Where possible, efforts were made to convert Flash animations to animated SVGs. These maintain the vector nature of the original animation, are easy to work with and make interactive, and remain accessible in modern browsers. This applies to pages such as the Teams landing page and Tracks, for example.
+
+For animations that could not be reproduced as SVGs, see [SVG to Video Converter](#svg-to-video-converter).
+
 ## SVG to Video Converter
 
 For Flash animations that could not be faithfully reproduced as animated SVGs, a custom shell script (`scripts/svg-to-video/animate_svgs.sh`) converts a numbered sequence of SVG frames into alpha-channel video files suitable for use in the browser.
@@ -45,11 +53,3 @@ Key configuration variables at the top of the script:
 - `FPS` — output frame rate (default: `30`)
 
 For full usage, flags, and troubleshooting see [`scripts/svg-to-video/README.md`](../scripts/svg-to-video/README.md).
-
-## Converting Complex Flash Animations
-
-### SVGs
-
-Where possible, efforts were made to convert Flash animations to animated SVGs. These maintain the vector nature of the original animation, are easy to work with and make interactive, and remain accessible in modern browsers. This applies to pages such as the Teams landing page and Tracks, for example.
-
-For animations that could not be reproduced as SVGs, see [SVG to Video Converter](#svg-to-video-converter).
