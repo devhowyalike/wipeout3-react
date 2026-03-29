@@ -1,6 +1,8 @@
 # Quality of Life Improvements
 
-wipeout3.com: React Edition includes a number of quality of life improvements over the original Flash website. Most improvements are built in and always active. Where a change represents an opinionated departure from the original Flash experience, it is configurable via the [Options](OPTIONS.md) menu, allowing users to tailor the experience to their preferences or restore the original behavior.
+wipeout3.com: React Edition includes a number of quality of life improvements over the original Flash website.
+
+Most improvements are enabled by default. Where a change represents an opinionated departure from the original Flash experience, it is configurable via the [Options](OPTIONS.md) menu, allowing users to tailor the experience to their preferences or restore the original behavior.
 
 ## General
 
