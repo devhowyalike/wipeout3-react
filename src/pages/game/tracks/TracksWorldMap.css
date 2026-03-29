@@ -1,0 +1,15 @@
+.world-map path:hover {
+  cursor: pointer;
+}
+
+.track-text {
+  display: none;
+}
+
+.track-group:hover .track-linked {
+  fill: var(--color-heading-1);
+}
+
+.track-group:hover .track-text {
+  display: block;
+}

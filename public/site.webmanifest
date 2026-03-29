@@ -1,0 +1,21 @@
+{
+  "name": "Wipeout 3",
+  "short_name": "WWW.3",
+  "description": "A recreation of the 1999 Wipeout 3 Flash website by Kleber, The Designers Republic, and Psygnosis. Built using React.",
+  "icons": [
+    {
+      "src": "/web-app-manifest-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/web-app-manifest-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "display": "standalone",
+  "orientation": "portrait"
+}

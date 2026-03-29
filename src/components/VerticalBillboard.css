@@ -1,0 +1,103 @@
+@keyframes billboard-shimmer {
+  0% { background-position: 0 -200%; }
+  100% { background-position: 0 200%; }
+}
+
+.vertical-billboard-skeleton {
+  background: linear-gradient(
+    180deg,
+    #d1d5db 25%,
+    #f3f4f6 50%,
+    #d1d5db 75%
+  );
+  background-size: 100% 200%;
+  animation: billboard-shimmer 1.5s ease-in-out infinite;
+}
+
+/* Safari can flash when a single animated track snaps back to its start.
+   Two staggered sequences keep the reset off-screen while preserving a
+   compositor-friendly transform animation. */
+@keyframes billboard-sequence-primary {
+  0% { transform: translate3d(0, 0, 0); }
+  49.999% { transform: translate3d(0, calc(var(--sequence-height, 0px) * -1), 0); }
+  50% { transform: translate3d(0, var(--sequence-height, 0px), 0); }
+  100% { transform: translate3d(0, 0, 0); }
+}
+
+@keyframes billboard-sequence-secondary {
+  0% { transform: translate3d(0, var(--sequence-height, 0px), 0); }
+  49.999% { transform: translate3d(0, 0, 0); }
+  100% { transform: translate3d(0, calc(var(--sequence-height, 0px) * -1), 0); }
+}
+
+.scroll-container {
+  position: relative;
+  isolation: isolate;
+  width: 100%;
+}
+
+.scroll-container.animating .vertical-billboard-sequence {
+  animation-duration: calc(var(--scroll-duration, 2000ms) * 2);
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  will-change: transform;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  transform: translate3d(0, 0, 0);
+}
+
+.scroll-container.animating .vertical-billboard-sequence-primary {
+  animation-name: billboard-sequence-primary;
+}
+
+.scroll-container.animating .vertical-billboard-sequence-secondary {
+  animation-name: billboard-sequence-secondary;
+}
+
+.scroll-container.paused .vertical-billboard-sequence {
+  animation-play-state: paused;
+}
+
+.vertical-billboard {
+  position: relative;
+  line-height: 0; /* Remove any potential spacing between images */
+  background: #000;
+}
+
+.vertical-billboard::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  /* Masks the last 1-frame compositor seam visible in Safari at loop time. */
+  height: 2px;
+  background: #000;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.vertical-billboard-sequence {
+  position: absolute;
+  inset: 0 0 auto 0;
+  flex-shrink: 0;
+  width: 100%;
+}
+
+.vertical-billboard-sequence-secondary {
+  transform: translate3d(0, var(--sequence-height, 0px), 0);
+}
+
+.vertical-billboard-slide {
+  font-size: 0; /* Remove any potential spacing between images */
+  margin-top: -1px;
+  padding-top: 1px;
+}
+
+/* Composite layer optimization for images */
+.vertical-billboard-image {
+  display: block; /* Remove any potential spacing */
+  margin: 0; /* Remove any potential spacing */
+  width: 100%;
+  min-width: 100%;
+}

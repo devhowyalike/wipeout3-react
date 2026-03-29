@@ -1,0 +1,19 @@
+.svg-container {
+  overflow: visible;
+}
+
+/* Only apply hover effects on devices that can hover */
+@media (hover: hover) {
+  .svg-container:hover {
+    cursor: pointer;
+  }
+
+  .svg-container:hover .stretch {
+    transform: scaleX(1.25);
+  }
+}
+
+.stretch {
+  transform-origin: left;
+  transition: transform 0.3s linear;
+}

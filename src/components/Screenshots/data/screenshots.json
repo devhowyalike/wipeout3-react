@@ -1,0 +1,52 @@
+{
+  "screenshots": [
+    {
+      "id": "porto-kora",
+      "name": "Porto Kora",
+      "titleCard": "porto-kora",
+      "count": 12
+    },
+    {
+      "id": "sampa-run",
+      "name": "Sampa Run",
+      "titleCard": "sampa-run",
+      "count": 12
+    },
+    {
+      "id": "hi-fumii",
+      "name": "Hi-Fumii",
+      "titleCard": "hi-fumii",
+      "count": 12
+    },
+    {
+      "id": "stanza-inter",
+      "name": "Stanza Inter",
+      "titleCard": "stanza-inter",
+      "count": 12
+    },
+    {
+      "id": "p-mar-project",
+      "name": "P-Mar Project",
+      "titleCard": "p-mar-project",
+      "count": 12
+    },
+    {
+      "id": "mega-mall",
+      "name": "Mega Mall",
+      "titleCard": "mega-mall",
+      "count": 12
+    },
+    {
+      "id": "manor-top",
+      "name": "Manor Top",
+      "titleCard": "manor-top",
+      "count": 12
+    },
+    {
+      "id": "terminal",
+      "name": "Terminal",
+      "titleCard": "terminal",
+      "count": 12
+    }
+  ]
+}

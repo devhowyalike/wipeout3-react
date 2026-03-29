@@ -1,0 +1,105 @@
+:root {
+  --svg-height: 211px;
+  --svg-width: 147px;
+  --timing: 0.3s;
+  --reset-timing: 0.1s;
+  --timing-function: linear;
+  --timing-direction: forwards;
+  --2-line-height: 4px;
+  --3-line-height: 22px;
+}
+
+/* Shared Classes */
+.colour-breakdown {
+  display: flex;
+  flex-direction: column;
+  transform: translateY(0);
+}
+
+.stretch-container {
+  height: var(--svg-height);
+  width: var(--svg-width);
+}
+
+.stretch-container svg {
+  height: 100%;
+  display: block;
+  will-change: transform;
+}
+
+/* Force immediate reset when no team is selected */
+div[data-team=""] .colour-breakdown,
+div[data-team=""] .stretch-container {
+  height: var(--svg-height) !important;
+  transform: translateY(0) !important;
+  transition: none !important;
+}
+
+/* Select all data-team elements not an empty string */
+div[data-team]:not([data-team=""]) .colour-breakdown {
+  transition: transform var(--timing) var(--timing-function);
+}
+
+div[data-team]:not([data-team=""]) .stretch-container {
+  transition: height var(--timing) var(--timing-function);
+}
+
+/* Teams Animations */
+div[data-team="agsystems"] .stretch-container,
+div[data-team="goteki45"] .stretch-container {
+  height: var(--3-line-height);
+}
+
+div[data-team="icaras"] {
+  .stretch-container {
+    height: var(--3-line-height);
+  }
+  .colour-breakdown {
+    transform: translateY(70px);
+  }
+}
+
+div[data-team="pirhanaAdv"],
+div[data-team="auricom"] {
+  .stretch-container {
+    height: var(--2-line-height);
+  }
+  .colour-breakdown {
+    transform: translateY(138px);
+  }
+}
+
+div[data-team="qirex"] {
+  position: relative;
+
+  .stretch-container {
+    height: var(--3-line-height);
+  }
+  .colour-breakdown {
+    position: absolute;
+    bottom: 1.5px; /* sub-pixel adjustment */
+    transform: none;
+  }
+}
+
+div[data-team="feisar"] {
+  position: relative;
+
+  .stretch-container {
+    height: var(--2-line-height);
+  }
+  .colour-breakdown {
+    position: absolute;
+    bottom: 1.5px; /* sub-pixel adjustment */
+    transform: none;
+  }
+}
+
+div[data-team="assegai"] {
+  .stretch-container {
+    height: var(--2-line-height);
+  }
+  .colour-breakdown {
+    transform: translateY(88px);
+  }
+}

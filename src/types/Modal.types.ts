@@ -1,0 +1,19 @@
+/** Props for the `Modal` component that renders content as an overlay or popup window. */
+export interface ModalProps {
+  children: React.ReactNode;
+  // Dimensions for popup window
+  popUpWidth?: number;
+  popUpHeight?: number;
+  // Dimensions for modal (can use vw, px, etc.)
+  modalWidth?: string | number;
+  modalHeight?: string | number;
+  // Legacy props for backward compatibility
+  // Controls both popup and modal
+  width?: number;
+  height?: number;
+  // Override modal behavior and force popup
+  // Only available in large breakpoint
+  isPopUp?: boolean;
+  // Callback when modal is closed
+  onClose?: () => void;
+}

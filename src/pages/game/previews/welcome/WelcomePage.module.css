@@ -1,0 +1,30 @@
+@keyframes pop-visible {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fade-in-subtitle {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.title {
+  animation: pop-visible 0s ease-out 0.1s both;
+}
+
+.logotype {
+  animation: pop-visible 0s ease-out 1.5s both;
+}
+
+.subtitle {
+  display: block;
+  animation: fade-in-subtitle 1.4s ease-out 0.7s both;
+}
