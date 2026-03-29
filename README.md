@@ -96,6 +96,10 @@ And thank you to [The Designers Republic](http://www.thedesignersrepublic.com/),
 - [JPEXS Free Flash Decompiler](https://github.com/jindrapetrik/jpexs-decompiler)
 - [SVG to Video Script](scripts/svg-to-video/README.md) — converts SVG frame sequences into alpha-channel WebM/MOV videos
 
+## Contributing
+
+Contributions are welcome. Please read [CONTRIBUTING.md](CONTRIBUTING.md) before opening a pull request — it covers the dev setup, code style, branching conventions, and commit message format.
+
 ## License
 
 This project is maintained under a custom preservation license. See [LICENSE](LICENSE.md) for details.
