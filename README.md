@@ -4,6 +4,8 @@
 
 The 1999 _Wipeout 3_ [Flash](https://en.wikipedia.org/wiki/Adobe_Flash) website, designed by [The Designers Republic](http://www.thedesignersrepublic.com/), developed by [Kleber](http://kleber.net), published by [Psygnosis](http://www.psygnosis.co.uk) — rebuilt in [React](https://reactjs.org/).
 
+**Live Site:** [wipeout3.app](https://wipeout3.app)
+
 Original Flash Website: wipeout3.com | kleber.net/wipeout3 _(no longer active)_.
 
 > **Community Project** — This is an unofficial recreation. Wipeout 3 is © Sony Interactive Entertainment / Psygnosis. Not affiliated with Sony, Psygnosis, Kleber, or The Designers Republic.
