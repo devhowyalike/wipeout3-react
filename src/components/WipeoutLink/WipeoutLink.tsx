@@ -13,6 +13,7 @@ import { useReducedMotion } from "@/hooks/useReducedMotion";
 import { useOptions } from "@/hooks/useOptions";
 import { soundManager } from "@/utils/soundManager";
 import { animations, AnimationId } from "./animations";
+import type { Animation } from "./animations";
 import { HoverAnimation } from "./HoverAnimation";
 
 type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement>;
@@ -20,7 +21,7 @@ type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement>;
 type WipeoutLinkBaseProps = {
   children: ReactNode;
   className?: string;
-  animation?: AnimationId;
+  animation?: AnimationId | Animation;
   onClick?: (event: MouseEvent<HTMLAnchorElement | HTMLButtonElement>) => void;
 };
 
@@ -63,7 +64,12 @@ export const WipeoutLink: FC<WipeoutLinkProps> = ({
     as === "link" ? (props.to as string) : undefined,
   );
   toRef.current = as === "link" ? (props.to as string) : undefined;
-  const animationData = animation ? animations[animation] : undefined;
+  // AnimationId (string) → registry lookup; inline Animation object → used directly
+  const animationData = animation
+    ? typeof animation === "string"
+      ? animations[animation]
+      : animation
+    : undefined;
   const reducedMotion = useReducedMotion();
   const { disableHoverAnimations } = useOptions();
   const navigate = useNavigate();

@@ -9,9 +9,13 @@ import { bannerData } from "@/components/Banner/bannerData";
 import { modalWidth, modalHeight } from "@/components/Banner/bannerConfig";
 import { useOptions } from "@/hooks/useOptions";
 import { getVideoWidth } from "@/components/Banner/bannerConfig";
+import type { Animation } from "@/components/WipeoutLink/animations";
+import { positionSetOne as pos } from "@/components/WipeoutLink/animations/positions";
 
 // Only import Ruffle preloader if feature flag is enabled
-const RufflePreloader = lazy(() => import("@/components/Ruffle/RufflePreloader"));
+const RufflePreloader = lazy(
+  () => import("@/components/Ruffle/RufflePreloader"),
+);
 
 /** Team banners gallery page. */
 export default function BannersPage() {
@@ -19,12 +23,17 @@ export default function BannersPage() {
   const bannerRefs = useRef<Record<string, BannerHandle | null>>({});
 
   // Create menu items directly from banner data
-  const menuItems: MenuItem[] = bannerData.map((banner) => ({
+  const menuItems: MenuItem[] = bannerData.map((banner, i) => ({
     id: banner.id,
     label: banner.name,
     // Use hash to prevent page navigation
     path: "#",
-    animation: undefined,
+    // Hover animations
+    animation: {
+      folder: "shared",
+      sources: `hover${(i % 7) + 1}`,
+      style: pos[`row${(i % 7) + 1}`],
+    } satisfies Animation,
     modalConfig: {
       content: (
         <Modal
@@ -37,7 +46,9 @@ export default function BannersPage() {
           }}
         >
           <Banner
-            ref={(el) => { bannerRefs.current[banner.id] = el; }}
+            ref={(el) => {
+              bannerRefs.current[banner.id] = el;
+            }}
             bannerId={banner.id}
             autoplay={true}
           />
