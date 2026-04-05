@@ -102,6 +102,6 @@ Contributions are welcome. Please read [CONTRIBUTING.md](CONTRIBUTING.md) before
 
 ## License
 
-This project is maintained under a custom preservation license. See [LICENSE](LICENSE.md) for details.
+This project is licensed under [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/) — a digital preservation license. See [LICENSE](LICENSE.md) for details.
 
 > Original site by Kleber & The Designers Republic. Wipeout 3 is © Sony Interactive Entertainment / Psygnosis. 2026 YAMEEN & THE W1P30UT.R3ACT PROJECT
