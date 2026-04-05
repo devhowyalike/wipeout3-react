@@ -5,6 +5,7 @@
   "type": "module",
   "packageManager": "pnpm@10.33.0",
   "description": "A recreation of the 1999 Wipeout 3 Flash website by Kleber, The Designers Republic, and Psygnosis. Built using React.",
+  "license": "CC-BY-NC-SA-4.0",
   "scripts": {
     "dev": "vite --host",
     "build": "tsc -b && vite build",

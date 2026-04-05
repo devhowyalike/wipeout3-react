@@ -1,6 +1,6 @@
 # Digital Preservation Project License
 
-This project is licensed under Creative Commons Attribution-NonCommercial 4.0 International (CC BY-NC 4.0).
+This project is licensed under Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0).
 
 ## Project Scope
 
@@ -23,6 +23,7 @@ Under the following terms:
 
 - Attribution — Credit the original work and this preservation effort
 - Personal Use Only — No commercial or public redistribution
+- ShareAlike — Adaptations must be distributed under the same or a compatible license, ensuring derivative works remain non-commercial and preservation-oriented
 - Historical Preservation — This work exists for archival and educational purposes
 
 ## Fair Use Declaration
