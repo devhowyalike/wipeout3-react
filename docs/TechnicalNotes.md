@@ -15,6 +15,15 @@ The resolved CSS is injected as a `<style>` tag prepended to `<head>`. It contai
 
 Because the values are derived from the actual CSS and constants files, adding or modifying a theme in `index.css` is automatically reflected in the injected block with no manual updates required.
 
+## Touch Navigation Modes
+
+Menu links on touch devices support two navigation modes, implemented in `src/components/WipeoutLink/WipeoutLink.tsx`.
+
+| Mode | Trigger | Behavior |
+| ---- | ------- | --------- |
+| **Wait-for-animation** | Default | First tap plays the hover animation; navigation fires automatically when the animation ends. A second tap while the animation is playing skips the remainder and navigates immediately. |
+| **Immediate** | `disableHoverAnimations` option **or** `prefers-reduced-motion` | Taps navigate instantly with no animation. |
+
 ## Converting Complex Flash Animations
 
 ### SVGs
@@ -53,20 +62,3 @@ Key configuration variables at the top of the script:
 - `FPS` — output frame rate (default: `30`)
 
 For full usage, flags, and troubleshooting see [`scripts/svg-to-video/README.md`](../scripts/svg-to-video/README.md).
-
-## Touch Navigation Modes
-
-Menu links on touch devices support three navigation modes, implemented in `src/components/WipeoutLink/WipeoutLink.tsx`.
-
-| Mode | Trigger | Behaviour |
-| ---- | ------- | --------- |
-| **Wait-for-animation** | Default | First tap plays the hover animation clip and queues navigation via `pendingNavRef`. Navigation fires in `handleAnimationEnded` when the clip ends. A second tap while the animation is still playing executes `pendingNavRef` immediately and skips the rest of the clip. |
-| **Immediate** | `disableHoverAnimations` option **or** `prefers-reduced-motion` | Animations are never loaded or started. Taps fall through to Branch 2 in `handleClick` and navigate synchronously. |
-
-### Key refs and state
-
-| Name | Type | Purpose |
-| ---- | ---- | ------- |
-| `touchOriginatedRef` | `MutableRefObject<boolean>` | Set to `true` in `onTouchStart`, cleared once the tap is handled, so `handleClick` can distinguish touch taps from mouse clicks. |
-| `pendingNavRef` | `MutableRefObject<(() => void) \| null>` | Captures the navigation closure (including `navigate()`, `playClickSound`, and `soundManager.lockForNavigation`) while the animation plays. Cleared after it fires. |
-| `isWaitingForAnimation` | `boolean` state | `true` while the animation is playing and navigation is pending. Drives the active highlight style and gates the second-tap shortcut. |

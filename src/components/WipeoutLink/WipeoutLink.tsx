@@ -39,7 +39,7 @@ type WipeoutLinkProps = WipeoutLinkAsLink | WipeoutLinkAsButton;
 /**
  * Navigation link (or button) with optional hover animation clips and UI sounds.
  *
- * Touch behaviour has two modes:
+ * Touch behavior has two modes:
  * 1. **Wait-for-animation** (default) — tap plays the animation, navigates when it ends. A second tap skips to navigate immediately.
  * 2. **Immediate** (`disableHoverAnimations` option or `prefers-reduced-motion`) — tap navigates instantly; no animation is loaded.
  */
@@ -60,7 +60,7 @@ export const WipeoutLink: FC<WipeoutLinkProps> = ({
   const onClickRef = useRef(onClick);
   onClickRef.current = onClick;
   const toRef = useRef<string | undefined>(
-    as === "link" ? (props.to as string) : undefined
+    as === "link" ? (props.to as string) : undefined,
   );
   toRef.current = as === "link" ? (props.to as string) : undefined;
   const animationData = animation ? animations[animation] : undefined;
@@ -109,7 +109,7 @@ export const WipeoutLink: FC<WipeoutLinkProps> = ({
   }, [disableHoverAnimations]);
 
   const handleClick = (
-    e: MouseEvent<HTMLAnchorElement | HTMLButtonElement>
+    e: MouseEvent<HTMLAnchorElement | HTMLButtonElement>,
   ) => {
     // Early exit — second tap while animation is mid-play: navigate immediately
     if (isWaitingForAnimation && pendingNavRef.current) {
