@@ -1,4 +1,4 @@
-import type { AnimationId } from "@/components/WipeoutLink/animations";
+import type { Animation, AnimationId } from "@/components/WipeoutLink/animations";
 import type { RouteId } from "@/routes/Route.Ids";
 
 /** A single navigation entry rendered by the `Menu` component. */
@@ -6,7 +6,7 @@ export interface MenuItem {
   id: string;
   path: string | undefined;
   label: string;
-  animation: AnimationId | undefined;
+  animation: AnimationId | Animation | undefined;
   modalConfig?: ModalConfig;
 }
 
