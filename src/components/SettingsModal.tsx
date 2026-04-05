@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
+import { useBodyScrollLock } from "@/hooks/useBodyScrollLock";
 import { createPortal } from "react-dom";
 import { useEscapeKey } from "./useEscapeKey";
 import {
@@ -83,13 +84,7 @@ export default function SettingsModal({
 
   useEscapeKey(handleRequestClose);
 
-  useEffect(() => {
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    return () => {
-      document.body.style.overflow = previousOverflow;
-    };
-  }, []);
+  useBodyScrollLock();
 
   const handleToggle = (key: OptionKey) => {
     setDraft((prev) => {
