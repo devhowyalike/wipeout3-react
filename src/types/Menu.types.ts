@@ -28,16 +28,4 @@ export interface MenuProps {
    * where bandwidth is a concern).
    */
   prefetch?: boolean;
-  /**
-   * EXPERIMENTAL — Fundamentally changes the touch UX to a two-tap system.
-   *
-   * When `true`, the first tap on a touch device shows the hover animation and
-   * highlights the link; a second tap on the same item navigates. This is an
-   * opinionated departure from the standard tap-to-navigate convention and may
-   * surprise users who expect a single tap to follow a link.
-   *
-   * When `false`, taps navigate immediately and hover animations are not
-   * triggered on touch. Defaults to `true`.
-   */
-  touchHover?: boolean;
 }

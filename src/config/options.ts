@@ -12,7 +12,8 @@ export type OptionKey =
   | "psygnosisUrl"
   | "swipeHints"
   | "remapL"
-  | "wideCenter";
+  | "wideCenter"
+  | "disableHoverAnimations";
 
 /** Full options object: every `OptionKey` boolean plus the `pureMode` / `reactMode` flags. */
 export type AppOptions = Record<OptionKey, boolean> & {
@@ -44,6 +45,8 @@ export const OPTION_DESCRIPTIONS: Record<OptionKey, string> = {
     'Remaps every "L" to the Wipeout 3 custom glyph (U+E041), a vertical line matching the font\'s geometric style; opt-in due to inconsistent use on the original Flash site',
   wideCenter:
     "Centers the website in the middle of the screen on wide displays.",
+  disableHoverAnimations:
+    "Hover animations on menu links are disabled; on touch devices, taps navigate immediately without waiting for animations.",
 };
 
 /** Short description for each mode preset, displayed in the settings panel. */
@@ -65,6 +68,7 @@ export const OPTION_LABELS: Record<OptionKey, string> = {
   swipeHints: "Swipe Hints (Touch devices only)",
   remapL: "Remap 'L' Glyph",
   wideCenter: "Widescreen: Center Content",
+  disableHoverAnimations: "Menu: Disable Hover Animations",
 };
 
 /** Factory defaults applied when no persisted options exist in localStorage. */
@@ -82,6 +86,7 @@ export const DEFAULT_OPTIONS: AppOptions = {
   swipeHints: true,
   remapL: false,
   wideCenter: false,
+  disableHoverAnimations: false,
 };
 
 /** Option values forced when React Mode is active. */
@@ -97,6 +102,7 @@ export const REACT_MODE_OPTION_OVERRIDES: Omit<AppOptions, "pureMode" | "reactMo
   swipeHints: true,
   remapL: false,
   wideCenter: false,
+  disableHoverAnimations: false,
 };
 
 /** Option values forced when Pure Mode is active (restores original Flash site behavior). */
@@ -112,6 +118,7 @@ export const PURE_MODE_OPTION_OVERRIDES: Omit<AppOptions, "pureMode" | "reactMod
   swipeHints: false,
   remapL: false,
   wideCenter: false,
+  disableHoverAnimations: false,
 };
 
 /**

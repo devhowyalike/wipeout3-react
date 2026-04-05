@@ -16,18 +16,19 @@ Pure Mode is a preset that restores the app to its original Flash website config
 
 When active, Pure Mode applies the following overrides:
 
-| Option                | Pure Value | Effect                                     |
-| --------------------- | ---------- | ------------------------------------------ |
-| `xsText`              | `true`     | Extra-small text as it originally appeared |
-| `soundToggle`         | `false`    | Sound toggle hidden                        |
-| `countdownToggle`     | `false`    | Countdown pause button hidden              |
-| `modal`               | `false`    | Pop-up windows instead of modals           |
-| `bannersFlash`        | `true`     | Flash banners via Ruffle emulator          |
-| `reactEditionCredits` | `false`    | React Edition credits hidden               |
-| `contactModal`        | `false`    | mailto: link instead of contact modal      |
-| `swipeHints`          | `false`    | Swipe hints disabled                       |
-| `remapL`              | `false`    | "l" / "L" remapping disabled               |
-| `wideCenter`          | `false`    | Widescreen centering disabled              |
+| Option                   | Pure Value | Effect                                     |
+| ------------------------ | ---------- | ------------------------------------------ |
+| `xsText`                 | `true`     | Extra-small text as it originally appeared |
+| `soundToggle`            | `false`    | Sound toggle hidden                        |
+| `countdownToggle`        | `false`    | Countdown pause button hidden              |
+| `modal`                  | `false`    | Pop-up windows instead of modals           |
+| `bannersFlash`           | `true`     | Flash banners via Ruffle emulator          |
+| `reactEditionCredits`    | `false`    | React Edition credits hidden               |
+| `contactModal`           | `false`    | mailto: link instead of contact modal      |
+| `swipeHints`             | `false`    | Swipe hints disabled                       |
+| `remapL`                 | `false`    | "l" / "L" remapping disabled               |
+| `wideCenter`             | `false`    | Widescreen centering disabled              |
+| `disableHoverAnimations` | `false`    | Hover animations enabled                   |
 
 > [!NOTE]
 > When Pure Mode is active, individual option toggles are locked. To customize individual options, disable Pure Mode first.
@@ -38,18 +39,19 @@ React Mode is a preset that activates the default React Edition configuration. I
 
 When active, React Mode applies the following overrides:
 
-| Option                | React Value | Effect                                     |
-| --------------------- | ----------- | ------------------------------------------ |
-| `xsText`              | `false`     | Readable text sizing for modern screens    |
-| `soundToggle`         | `true`      | Sound toggle visible                       |
-| `countdownToggle`     | `true`      | Countdown pause button visible             |
-| `modal`               | `true`      | Modals instead of pop-up windows           |
-| `bannersFlash`        | `false`     | MP4 video banners instead of Flash         |
-| `reactEditionCredits` | `true`      | React Edition credits visible              |
-| `contactModal`        | `true`      | Contact form modal instead of mailto: link |
-| `swipeHints`          | `true`      | Swipe hints enabled                        |
-| `remapL`              | `false`     | "l" / "L" remapping disabled               |
-| `wideCenter`          | `false`     | Widescreen centering disabled              |
+| Option                   | React Value | Effect                                     |
+| ------------------------ | ----------- | ------------------------------------------ |
+| `xsText`                 | `false`     | Readable text sizing for modern screens    |
+| `soundToggle`            | `true`      | Sound toggle visible                       |
+| `countdownToggle`        | `true`      | Countdown pause button visible             |
+| `modal`                  | `true`      | Modals instead of pop-up windows           |
+| `bannersFlash`           | `false`     | MP4 video banners instead of Flash         |
+| `reactEditionCredits`    | `true`      | React Edition credits visible              |
+| `contactModal`           | `true`      | Contact form modal instead of mailto: link |
+| `swipeHints`             | `true`      | Swipe hints enabled                        |
+| `remapL`                 | `false`     | "l" / "L" remapping disabled               |
+| `wideCenter`             | `false`     | Widescreen centering disabled              |
+| `disableHoverAnimations` | `false`     | Hover animations enabled                   |
 
 ## `xsText`
 
@@ -144,6 +146,19 @@ Concerns:
 - The Ruffle Flash emulator is very capable, but may not accurately reproduce the original animation.
 - Browsers may block the Ruffle Flash emulator from loading because it executes external content (due to CSP restrictions, enterprise security policies, browser extensions, etc.).
 - Ruffle requires a large `.wasm` file to be downloaded (approximately 4.5 MB when gzipped), managed by the `RufflePreloader` component. On slower connections, this may cause a delay in rendering the banners.
+
+## `disableHoverAnimations`
+
+Disables hover animations on menu links.
+
+When enabled, the `<video>` element is not rendered and no network request is made for the animation asset.
+
+- **Desktop:** hover animations never play.
+- **Touch:** a single tap navigates immediately instead of playing the animation and waiting for it to finish.
+
+This option is also respected when `prefers-reduced-motion` is active, in which case animations are already skipped regardless of this setting.
+
+Setting to `false` (default) re-enables hover animations: desktop users see them on hover, and touch users see a brief animation before navigation completes.
 
 ## Technical Notes
 
