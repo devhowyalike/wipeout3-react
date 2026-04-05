@@ -4,7 +4,7 @@ This project is licensed under Creative Commons Attribution-NonCommercial 4.0 In
 
 ## Project Scope
 
-**Wipeout3.com: React Edition** is a historical preservation project that recreates the Wipeout 3 Flash website from 1999 using modern open-source web standards.
+**Wipeout3.com: React Edition** is a historical preservation project that recreates the Wipeout 3 Flash website from 1999 using modern open-source web technologies.
 
 The original website was created by [Kleber](http://kleber.net), [The Designers Republic](http://www.thedesignersrepublic.com/), and [Psygnosis](http://www.psygnosis.co.uk).
 

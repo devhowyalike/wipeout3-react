@@ -41,7 +41,7 @@ When active, React Mode applies the following overrides:
 
 | Option                   | React Value | Effect                                     |
 | ------------------------ | ----------- | ------------------------------------------ |
-| `xsText`                 | `false`     | Readable text sizing for modern screens    |
+| `xsText`                 | `true`      | Extra-small text as it originally appeared |
 | `soundToggle`            | `true`      | Sound toggle visible                       |
 | `countdownToggle`        | `true`      | Countdown pause button visible             |
 | `modal`                  | `true`      | Modals instead of pop-up windows           |
