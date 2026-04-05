@@ -1,9 +1,9 @@
 import { useState } from "react";
-import { createPortal } from "react-dom";
 import { safeLocalStorage } from "@/components/settings/safeLocalStorage";
-import { useBodyScrollLock } from "@/hooks/useBodyScrollLock";
+import { BaseDialog } from "./ui/BaseDialog";
 
 const STORAGE_KEY = "wipeout3-disclaimer-seen";
+const HEADING_ID = "disclaimer-modal-heading";
 
 let dismissedThisSession = false;
 
@@ -13,8 +13,6 @@ export function DisclaimerModal() {
       !dismissedThisSession && safeLocalStorage("get", STORAGE_KEY) !== "true",
   );
 
-  useBodyScrollLock(visible);
-
   if (!visible) return null;
 
   const handleClose = () => {
@@ -23,19 +21,23 @@ export function DisclaimerModal() {
     setVisible(false);
   };
 
-  return createPortal(
-    <div
+  return (
+    <BaseDialog
       data-theme="sandTheme"
-      className="fixed inset-0 z-50 bg-page/95 overflow-auto flex items-center justify-center px-6 py-8"
+      aria-labelledby={HEADING_ID}
+      className="bg-page/98 overflow-auto flex items-center justify-center px-6 py-8"
     >
       <div className="max-w-2xl w-full text-center space-y-6 my-auto">
-        <p className="font-wipeout3 text-white text-w3-fluid-xl uppercase tracking-wide whitespace-nowrap subpixel-fix">
+        <h1 className="font-wipeout3 text-white text-w3-fluid-xl uppercase tracking-wide whitespace-nowrap subpixel-fix">
           Wip3out R3act
-        </p>
-
-        <h1 className="font-wipeout3 text-white text-w3-fluid-lg uppercase tracking-wide subpixel-fix">
-          Preservation Project
         </h1>
+
+        <h2
+          id={HEADING_ID}
+          className="font-wipeout3 text-white text-w3-fluid-lg uppercase tracking-wide subpixel-fix"
+        >
+          Preservation Project
+        </h2>
 
         <p className="font-vt323 text-body text-base leading-6 uppercase text-pretty sm:max-w-md md:max-w-sm mx-auto">
           An unofficial fan-made preservation of the original Wipeout 3 Flash
@@ -56,7 +58,6 @@ export function DisclaimerModal() {
           I Understand<span className="animate-w3-blink">_</span>
         </button>
       </div>
-    </div>,
-    document.body,
+    </BaseDialog>
   );
 }

@@ -19,7 +19,7 @@ export function SettingsToggle({ checked, onToggle }: SettingsToggleProps) {
         }
       }}
       tabIndex={0}
-      className="flex items-center cursor-pointer"
+      className="flex items-center cursor-pointer rounded-sm focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-white/70 focus-visible:ring-offset-2 focus-visible:ring-offset-page"
     >
       <span
         className={`inline-block w-8 h-4 rounded-sm relative transition-colors ${

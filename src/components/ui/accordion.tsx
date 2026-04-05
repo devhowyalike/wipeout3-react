@@ -22,12 +22,13 @@ type AccordionTriggerProps =
 const AccordionTrigger = React.forwardRef<
   React.ComponentRef<typeof AccordionPrimitive.Trigger>,
   AccordionTriggerProps
->(({ className, children, action, ...props }, ref) => (
+>(({ className, children, action, tabIndex, ...props }, ref) => (
   <AccordionPrimitive.Header className="flex items-center">
     <AccordionPrimitive.Trigger
       ref={ref}
+      tabIndex={tabIndex ?? 0}
       className={[
-        "flex flex-1 items-center py-2 transition-all cursor-pointer",
+        "flex flex-1 items-center py-2 transition-all cursor-pointer focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-white/70",
         className,
       ]
         .filter(Boolean)

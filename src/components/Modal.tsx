@@ -1,8 +1,9 @@
 import { useEffect, useState, useRef } from "react";
-import { createPortal } from "react-dom";
 import { useModal } from "@/hooks/useModal";
 import { ModalProps } from "@/types/Modal.types";
 import { useEscapeKey } from "./useEscapeKey";
+import { BaseDialog } from "./ui/BaseDialog";
+import { ModalCloseButton } from "./ui/ModalCloseButton";
 
 /**
  * Renders content as a centered modal overlay (with portal) or delegates to a browser popup window,
@@ -53,7 +54,7 @@ export function Modal({
         finalPopUpWidth,
         finalPopUpHeight,
         children,
-        onClose
+        onClose,
       );
       if (popup) {
         popupWindowRef.current = popup;
@@ -96,12 +97,6 @@ export function Modal({
   // Register ESC key handler with centralized escape navigation
   useEscapeKey(handleClose);
 
-  const handleOverlayClick = (e: React.MouseEvent) => {
-    if (e.target === e.currentTarget) {
-      handleClose();
-    }
-  };
-
   // Don't render if we're not in modal mode or if it's closed
   if (!isOpen || !isModalEnabled) return null;
 
@@ -114,40 +109,26 @@ export function Modal({
   };
 
   return (
-    <>
-      {createPortal(
-        <div
-          className="fixed inset-0 z-40 bg-page"
-          onClick={handleOverlayClick}
-          data-overlay="true"
-        >
-          <div
-            className="w3-app-max-width mx-auto relative flex h-full w-full items-center justify-center px-6 py-4"
-            onClick={handleOverlayClick}
-          >
-            <button
-              tabIndex={0}
-              onClick={handleClose}
-              className="absolute top-4 right-6 z-50 cursor-pointer text-nav hover:text-nav-hover font-wipeout3 text-5xl"
-              aria-label="Close modal"
-            >
-              ×
-            </button>
+    <BaseDialog
+      closeOnBackdrop
+      onClose={handleClose}
+      className="bg-page"
+      data-overlay="true"
+    >
+      <div className="w3-app-max-width mx-auto relative flex h-full w-full items-center justify-center px-6 py-4 pointer-events-none">
+        <ModalCloseButton onClick={handleClose} />
 
-            <div
-              className="relative w-full"
-              style={{
-                maxWidth: getStyleValue(finalModalWidth),
-                maxHeight: "90vh",
-                aspectRatio: aspectRatio,
-              }}
-            >
-              <div className="h-full w-full">{children}</div>
-            </div>
-          </div>
-        </div>,
-        document.body
-      )}
-    </>
+        <div
+          className="relative w-full pointer-events-auto"
+          style={{
+            maxWidth: getStyleValue(finalModalWidth),
+            maxHeight: "90vh",
+            aspectRatio: aspectRatio,
+          }}
+        >
+          <div className="h-full w-full">{children}</div>
+        </div>
+      </div>
+    </BaseDialog>
   );
 }

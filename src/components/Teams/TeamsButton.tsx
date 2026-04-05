@@ -57,7 +57,6 @@ const TeamsButtonComponent: React.FC<TeamsButtonProps> = ({
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
       onClick={handleClick}
-      tabIndex={0}
       className="focus:outline-hidden focus-visible:ring-2 focus-visible:ring-black inline-flex w-fit"
     >
       <IconComponent />

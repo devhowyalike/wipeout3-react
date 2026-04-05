@@ -38,17 +38,21 @@ function LayoutContent() {
 
   useNavigationEventGuard(mainRef, pathname);
 
-  // Reset scroll position on route change
+  // Reset scroll and focus on route change so screen readers (VoiceOver, etc.)
+  // announce the new page instead of leaving focus on a stale or removed element.
   useEffect(() => {
     if (mainRef.current) {
       mainRef.current.scrollTop = 0;
+      mainRef.current.focus({ preventScroll: true });
     }
   }, [pathname]);
 
   return (
     <CRTEffects>
       <AppContainer className="h-full flex flex-col">
-        <main ref={mainRef} className="flex-1 overflow-auto min-h-0">
+        {/* tabIndex={-1} receives programmatic focus on route changes and as a
+            fallback when a modal's original trigger unmounts. */}
+        <main ref={mainRef} tabIndex={-1} className="flex-1 overflow-auto min-h-0">
           <div className={`w-full h-full px-6 py-6 ${wideCenter ? "w3-app-max-width mx-auto" : ""}`}>
             <Outlet />
           </div>

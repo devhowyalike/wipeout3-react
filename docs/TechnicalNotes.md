@@ -44,6 +44,128 @@ Menu links on touch devices support two navigation modes, implemented in `src/co
 | **Wait-for-animation** | Default                                                         | First tap plays the hover animation; navigation fires automatically when the animation ends. A second tap while the animation is playing skips the remainder and navigates immediately. |
 | **Immediate**          | `disableHoverAnimations` option **or** `prefers-reduced-motion` | Taps navigate instantly with no animation.                                                                                                                                              |
 
+## Accessibility
+
+### Known Issue: Safari Tab Navigation
+
+Safari on macOS excludes `<a>` and `<button>` elements from the Tab key sequence by default. Two user-side settings control this:
+
+| Setting                                           | Location                         |
+| ------------------------------------------------- | -------------------------------- |
+| **Keyboard navigation**                           | macOS System Settings → Keyboard |
+| **Press Tab to highlight each item on a webpage** | Safari → Settings → Advanced     |
+
+Both default to **off**, meaning most Mac users can only Tab into text inputs and selects — links and buttons are silently skipped. Users on Safari who need full keyboard navigation should enable both settings above.
+
+### Modal Accessibility via Native `<dialog>`
+
+All modals (`DisclaimerModal`, `SettingsModal`, `Modal`, `DiscardConfirmOverlay`) use the native `<dialog>` element opened with `.showModal()`. This single API call provides several accessibility features:
+
+| Feature              | How the browser handles it                                                          |
+| -------------------- | ----------------------------------------------------------------------------------- |
+| **Focus trapping**   | Tab wraps within the dialog automatically                                           |
+| **Inert background** | Everything behind the top-layer dialog becomes `inert` — no focus or pointer events |
+| **Screen readers**   | Background content is hidden from assistive technology                              |
+| **Scroll blocking**  | Background content does not scroll while the dialog is open                         |
+| **Top layer**        | The dialog renders above all other content without `z-index` management             |
+
+Nested dialogs (e.g. `SettingsModal` → `DiscardConfirmOverlay`) are handled natively: the inner `.showModal()` promotes the confirm overlay to the top layer and automatically makes the parent dialog inert. When the inner dialog closes, focus returns to the parent.
+
+The shared `useShowModal` hook (`src/hooks/useShowModal.ts`) calls `.showModal()` on mount and `.close()` on cleanup.
+
+#### Suppressing the native `cancel` event
+
+Each dialog suppresses the native `cancel` event (which the browser fires when Escape is pressed) via a **direct DOM listener** rather than React's `onCancel` prop:
+
+```ts
+dialog.addEventListener("cancel", (e) => e.preventDefault());
+```
+
+`onCancel` cannot be used here because `cancel` does not bubble, and React's synthetic event delegation only intercepts bubbling events — so it never fires for portaled dialogs. The direct listener is attached inside `useShowModal` and removed on teardown. Escape handling is left entirely to the centralised `EscapeNavigation` stack (see [EscapeNavigation and Stacked Escape Handling](#escapenavigation-and-stacked-escape-handling) below).
+
+#### Focus management on open and close
+
+The guiding principle is that **focus indicators should only be visible when the user is actually navigating by keyboard**. This preserves the original Flash website's artistic intent — the Wipeout 3 site was a carefully designed visual experience, and focus rings appearing on mouse clicks would introduce unstyled browser chrome that the original never had. Beyond fidelity, a focus ring on a button that someone just clicked with a mouse is noise: it signals "you can reach this with Tab" when the user already knows exactly where they are from their cursor position. Conversely, keyboard users have no cursor, so a visible focus indicator and a predictable focus position are their primary means of orientation.
+
+The CSS `:focus-visible` pseudo-class encodes exactly this intent. Every interactive element in the dialogs carries `focus-visible:ring-*` classes and no unconditional `ring-*`. Chromium 86+, Firefox 85+, and Safari 15.4+ all correctly suppress `:focus-visible` after pointer-triggered programmatic focus, so moving focus into the dialog on open does not produce a visible ring for mouse users — only for keyboard users.
+
+**On open:** before calling `.showModal()`, the opener element is unconditionally blurred:
+
+```ts
+previousActiveElement?.blur();
+```
+
+This is done regardless of input modality because VoiceOver's navigation keys (VO+Arrow) carry `ctrlKey` and are misclassified as pointer by the modality tracker, so a modality check here would leave focus on the trigger for those users.
+
+After `.showModal()`, focus is first parked on the dialog container so VoiceOver registers the new top-layer context:
+
+```ts
+dialog.tabIndex = -1;
+dialog.focus();
+```
+
+Focus then moves to the `[autofocus]` descendant after a short delay:
+
+```ts
+setTimeout(() => {
+  const target = dialog.querySelector<HTMLElement>("[autofocus]");
+  if (target) target.focus();
+}, 50);
+```
+
+Each dialog places `autofocus` on the element that should receive focus: the primary action button, or the close button where no single action is primary. Using `autofocus` rather than a hand-rolled focusable-element selector means each dialog controls its own initial focus position explicitly, and `useShowModal` stays decoupled from element-type heuristics.
+
+`setTimeout` (not `requestAnimationFrame`) is required because VoiceOver needs actual processing time — not just one paint frame — to absorb the top-layer promotion before it will follow a focus change. Without the delay, VoiceOver does not announce the newly focused element inside the dialog.
+
+This follows the ARIA APG dialog pattern, which requires focus to land on an element inside the dialog on open.
+
+**On close — keyboard-opened dialogs:** focus is restored to whichever element was active when the dialog opened (typically the button that triggered it). This is the standard accessible modal pattern — without it, keyboard focus would land on `<body>` or be lost entirely, forcing the user to Tab back through the page from the top to find their place. The restoration runs inside a `requestAnimationFrame` to let React finish unmounting, with a fallback to `<main>` if the opener has since been removed from the DOM. A secondary effect: retaining a dead reference to a removed dialog element as the active element causes subsequent Escape presses to miss the `EscapeNavigation` handler, so the blur-before-close step in the cleanup also guards against that.
+
+**On close — pointer-opened dialogs:** focus is deliberately _not_ restored to the opener. A pointer user knows where they are from their cursor position; programmatically re-focusing the button they clicked would surface a focus ring on it with no keyboard interaction to justify it.
+
+#### SettingsModal key-remount on reopen
+
+`Footer` tracks a `settingsModalKey` counter and passes it as `key` to `SettingsModal`:
+
+```tsx
+const handleOpenSettings = () => {
+  setSettingsModalKey((prev) => prev + 1);
+  setIsSettingsOpen(true);
+};
+
+{isSettingsOpen && <SettingsModal key={settingsModalKey} ... />}
+```
+
+Because `SettingsModal` is conditionally rendered, each unmount/remount cycle already triggers a fresh `useShowModal` effect. The key increment is belt-and-suspenders: it guarantees a genuinely new component instance even if React's reconciler would otherwise reuse the existing tree (e.g. in future refactors), ensuring that `useShowModal` captures the correct opener element and input modality on every open.
+
+### Input Modality Tracking
+
+`src/utils/inputModality.ts` records whether the user's most recent interaction was via keyboard or pointer. Two global capture-phase listeners — `pointerdown` and `keydown` (ignoring modifier-only presses such as Ctrl/Cmd/Alt) — update a module-level variable.
+
+The listeners are initialised **immediately on first import**, outside any React lifecycle. This is intentional: the interaction that opens a modal (a keyboard Enter on a focused button, or a mouse click) happens _before_ the modal component mounts and `useShowModal` runs its effect. Deferring setup to a `useEffect` would miss that event, causing every dialog to appear as pointer-opened regardless of how it was triggered.
+
+`useShowModal` calls `getLastInputModality()` synchronously at the top of its effect — before `.showModal()` shifts focus — so the captured value correctly reflects whether the dialog was opened by keyboard or pointer. This is used on teardown to decide whether to restore focus to the opener.
+
+### EscapeNavigation and Stacked Escape Handling
+
+`src/components/EscapeNavigation.tsx` wraps the application in a React context that exposes a push/pop handler stack. Components that need to intercept Escape (modals, overlays) register a callback on mount and unregister on unmount. The single `window` keydown listener always invokes the _most recently registered_ handler; when the stack is empty it falls back to `navigate(-1)` (i.e. browser back-navigation), unless the user is already on the home page.
+
+This design keeps Escape behaviour composable across nested dialogs without each layer needing direct knowledge of its siblings. It also means the suppression of the native `cancel` event in `useShowModal` is required — without it, the browser would silently close the dialog before `EscapeNavigation`'s keydown listener fires, breaking the centralised stack.
+
+### Route-Change Focus Management
+
+On every pathname change, `Layout` resets the scroll position of `<main>` and moves focus to it:
+
+```ts
+mainRef.current.scrollTop = 0;
+mainRef.current.focus({ preventScroll: true });
+```
+
+`<main>` carries `tabIndex={-1}` so it accepts programmatic focus without appearing in the Tab order. Moving focus here on navigation serves two purposes:
+
+1. **Screen reader announcement** — VoiceOver and other assistive technologies announce the new page context when focus lands on `<main>`, rather than leaving it on a stale or removed element from the previous route.
+2. **Modal fallback target** — when a modal's original opener unmounts while the dialog is open (e.g. navigating away during a modal), `useShowModal`'s teardown falls back to `document.querySelector("main")` for focus restoration rather than dropping focus on `<body>`.
+
 ## Converting Complex Flash Animations
 
 ### SVGs
