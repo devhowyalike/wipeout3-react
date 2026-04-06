@@ -10,8 +10,7 @@ let dismissedThisSession = false;
 export function DisclaimerModal() {
   const [visible, setVisible] = useState(
     () =>
-      !dismissedThisSession &&
-      safeLocalStorage("get", STORAGE_KEY) !== "true",
+      !dismissedThisSession && safeLocalStorage("get", STORAGE_KEY) !== "true",
   );
 
   useBodyScrollLock(visible);
@@ -38,11 +37,15 @@ export function DisclaimerModal() {
           Preservation Project
         </h1>
 
-        <p className="font-vt323 text-body text-base leading-6 uppercase">
-          This website is an unofficial fan-made preservation of the original
-          Wipeout 3 promotional site. It is not affiliated with, endorsed by, or
-          connected to Sony Interactive Entertainment, The Designers Republic,
-          Kleber, or Psygnosis. All trademarks and copyrights belong to their
+        <p className="font-vt323 text-body text-base leading-6 uppercase text-pretty sm:max-w-md md:max-w-sm mx-auto">
+          An unofficial fan-made preservation of the original Wipeout 3 Flash
+          promotional site, rebuilt in JavaScript using React and modern web
+          technologies.
+        </p>
+
+        <p className="font-vt323 text-body text-base leading-6 uppercase sm:max-w-md md:max-w-sm mx-auto">
+          Not affiliated with Sony Interactive Entertainment, The Designers
+          Republic, Kleber, or Psygnosis. All trademarks belong to their
           respective owners.
         </p>
 
