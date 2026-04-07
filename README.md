@@ -83,7 +83,7 @@ The following pages are incomplete due to the complexity of their animations, an
 
 ## Special Thanks
 
-Wip3out R3act was made possible thanks to the Flash archive documented by [supersock](https://omamoka.com/wipeout3/). Special thanks to them for their efforts in preserving the original website. For more information about their work, see their post [here](https://www.wipeoutzone.com/forum/showthread.php?10638-Back-up-of-the-original-wipEout-3-website-materials).
+Wip3out R3act was made possible thanks to the Flash archive documented by [supersocks](https://omamoka.com/wipeout3/). Special thanks to them for their efforts in preserving the original website. For more information about their work, see their post [here](https://www.wipeoutzone.com/forum/showthread.php?10638-Back-up-of-the-original-wipEout-3-website-materials).
 
 Thank you to [NR74W](https://github.com/NR74W/WipEout-Fonts) for their Wipeout fonts repository.
 
