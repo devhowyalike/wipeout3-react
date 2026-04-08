@@ -22,15 +22,15 @@ When active, Pure Mode applies the following overrides:
 | `contactModal`           | `false`    | mailto: link instead of contact modal      |
 | `countdownToggle`        | `false`    | Countdown pause button hidden              |
 | `disableHoverAnimations` | `false`    | Hover animations enabled                   |
+| `lowResolution`          | `true`     | CRT 800×600 scaling enabled                |
 | `modal`                  | `false`    | Pop-up windows instead of modals           |
 | `reactEditionCredits`    | `false`    | React Edition credits hidden               |
 | `remapL`                 | `false`    | "l" / "L" remapping disabled               |
+| `scanlineFilter1`        | `true`     | CRT filter enabled                         |
 | `soundToggle`            | `false`    | Sound toggle hidden                        |
 | `swipeHints`             | `false`    | Swipe hints disabled                       |
 | `wideCenter`             | `false`    | Widescreen centering disabled              |
 | `xsText`                 | `true`     | Extra-small text as it originally appeared |
-| `scanlineFilter1`        | `true`     | CRT filter enabled                         |
-| `lowResolution`          | `true`     | CRT 800×600 scaling enabled                |
 
 > [!NOTE]
 > When Pure Mode is active, individual option toggles are locked. To customize individual options, disable Pure Mode first.
@@ -47,15 +47,15 @@ When active, React Mode applies the following overrides:
 | `contactModal`           | `true`      | Contact form modal instead of mailto: link |
 | `countdownToggle`        | `true`      | Countdown pause button visible             |
 | `disableHoverAnimations` | `false`     | Hover animations enabled                   |
+| `lowResolution`          | `false`     | CRT 800×600 scaling disabled               |
 | `modal`                  | `true`      | Modals instead of pop-up windows           |
 | `reactEditionCredits`    | `true`      | React Edition credits visible              |
 | `remapL`                 | `false`     | "l" / "L" remapping disabled               |
+| `scanlineFilter1`        | `false`     | CRT filter disabled                        |
 | `soundToggle`            | `true`      | Sound toggle visible                       |
 | `swipeHints`             | `true`      | Swipe hints enabled                        |
 | `wideCenter`             | `false`     | Widescreen centering disabled              |
 | `xsText`                 | `true`      | Extra-small text as it originally appeared |
-| `scanlineFilter1`        | `false`     | CRT filter disabled                        |
-| `lowResolution`          | `false`     | CRT 800×600 scaling disabled               |
 
 ## `bannersFlash`
 
@@ -100,6 +100,12 @@ This option is also respected when `prefers-reduced-motion` is active, in which 
 
 Setting to `false` (default) re-enables hover animations: desktop users see them on hover, and touch users see a brief animation before navigation completes.
 
+## `lowResolution`
+
+Resizes the screen to 800x600, emulating the fixed resolution of a period-accurate CRT monitor. Below the `md` breakpoint, scaling is bypassed and children render at their natural size.
+
+When `wideCenter` is active the 800×600 box is centered (pillarboxed) rather than anchored to the top-left corner.
+
 ## `modal`
 
 Replaces pop-up windows with modals for a more modern, accessible experience.
@@ -119,6 +125,14 @@ Enables remapping of every "l" / "L" character to the WipEout 3 custom glyph sto
 Application of this substitution is inconsistent across the original Flash website — different pages and menus handle "l" / "L" differently — so this option is opt-in and defaults to `false`.
 
 Setting to `true` applies the substitution consistently wherever `remapL` / `remapLNode` is called.
+
+## `scanlineFilter1`
+
+Applies a full-screen CRT monitor effect over the entire site. The effect includes:
+
+- **Scanlines** — horizontal interlaced lines
+- **Noise** — animated static grain
+- **Vignette** — darkened edges
 
 ## `soundToggle`
 
@@ -163,20 +177,6 @@ Modals are always centered and capped at `1730px` regardless of this setting. Th
 ## `xsText`
 
 Enables small font sizes as they originally appeared on the Wipeout 3 Flash website, sacrificing legibility and accessibility on modern, higher resolution screens.
-
-## `scanlineFilter1`
-
-Applies a full-screen CRT monitor effect over the entire site. The effect includes:
-
-- **Scanlines** — horizontal interlaced lines
-- **Noise** — animated static grain
-- **Vignette** — darkened edges
-
-## `lowResolution`
-
-Resizes the screen to 800x600, emulating the fixed resolution of a period-accurate CRT monitor. Below the `md` breakpoint, scaling is bypassed and children render at their natural size.
-
-When `wideCenter` is active the 800×600 box is centered (pillarboxed) rather than anchored to the top-left corner.
 
 ## Technical Notes
 
