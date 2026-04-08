@@ -35,10 +35,6 @@ Most improvements are enabled by default. Where a change represents an opinionat
 
 - Animation boosts (targeting 60fps)
   - Animations across the site have been tuned for smoother, more fluid playback — targeting 60fps where doing so does not stray from the artistic intent of the original Flash website.
-  - CSS animations are driven by `transform` and `opacity` exclusively, keeping all motion on the GPU compositor thread and avoiding layout or paint work.
-  - `will-change: transform` is applied to elements that animate on a recurring basis (e.g. marquees, hover transitions, icon cycling) so the browser can promote them to their own compositor layer ahead of time.
-  - JavaScript-driven animations use `requestAnimationFrame` rather than `setInterval` or `setTimeout`, ensuring frame timing aligns with the display refresh rate.
-  - Heavy or off-screen animations (e.g. the 2097/XL vertical marquee, banner videos) are paused when they leave the viewport via `IntersectionObserver`, freeing compositor resources for on-screen content.
 
 - Retro display effects
   - Added an optional CRT scanline filter ([`scanlineFilter1`](OPTIONS.md#scanlinefilter1)) that overlays the entire site with horizontal scanlines, animated noise grain, and a vignette.
