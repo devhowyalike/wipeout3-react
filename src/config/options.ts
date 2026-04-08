@@ -13,7 +13,9 @@ export type OptionKey =
   | "swipeHints"
   | "remapL"
   | "wideCenter"
-  | "disableHoverAnimations";
+  | "disableHoverAnimations"
+  | "scanlineFilter1"
+  | "lowResolution";
 
 /** Full options object: every `OptionKey` boolean plus the `pureMode` / `reactMode` flags. */
 export type AppOptions = Record<OptionKey, boolean> & {
@@ -47,6 +49,10 @@ export const OPTION_DESCRIPTIONS: Record<OptionKey, string> = {
     "Centers the website in the middle of the screen on wide displays.",
   disableHoverAnimations:
     "Hover animations on menu links are disabled; on touch devices, taps navigate immediately without waiting for animations.",
+  scanlineFilter1:
+    "Simulates a period-accurate CRT monitor effect.",
+  lowResolution:
+    "Sets the site resolution to 800x600, emulating a period-accurate CRT monitor.",
 };
 
 /** Short description for each mode preset, displayed in the settings panel. */
@@ -57,6 +63,8 @@ export const MODE_DESCRIPTIONS: Record<"pureMode" | "reactMode", string> = {
 
 /** Short UI label for each option toggle, shown in the settings panel. */
 export const OPTION_LABELS: Record<OptionKey, string> = {
+  scanlineFilter1: "Scanline Filter",
+  lowResolution: "Low Resolution",
   psygnosisUrl: "Homepage: Psygnosis URL",
   bannersFlash: "Banners: Flash (via Ruffle)",
   xsText: "Small Text (original sizing)",
@@ -87,6 +95,8 @@ export const DEFAULT_OPTIONS: AppOptions = {
   remapL: false,
   wideCenter: false,
   disableHoverAnimations: false,
+  scanlineFilter1: false,
+  lowResolution: false,
 };
 
 /** Option values forced when React Mode is active. */
@@ -103,6 +113,8 @@ export const REACT_MODE_OPTION_OVERRIDES: Omit<AppOptions, "pureMode" | "reactMo
   remapL: false,
   wideCenter: false,
   disableHoverAnimations: false,
+  scanlineFilter1: false,
+  lowResolution: false,
 };
 
 /** Option values forced when Pure Mode is active (restores original Flash site behavior). */
@@ -119,6 +131,8 @@ export const PURE_MODE_OPTION_OVERRIDES: Omit<AppOptions, "pureMode" | "reactMod
   remapL: false,
   wideCenter: false,
   disableHoverAnimations: false,
+  scanlineFilter1: true,
+  lowResolution: true,
 };
 
 /**

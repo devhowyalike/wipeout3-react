@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import "./VerticalBillboard.css";
 import { useOptions } from "@/hooks/useOptions";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
@@ -37,19 +38,18 @@ const VerticalBillboard: React.FC<VerticalBillboardProps> = ({
     if (!sequenceRef.current || !images.length) return;
 
     const imageElements = Array.from(
-      sequenceRef.current.querySelectorAll("img")
+      sequenceRef.current.querySelectorAll("img"),
     );
     let settledCount = 0;
 
     const updateHeight = () => {
-      const height =
-        sequenceRef.current?.getBoundingClientRect().height ?? 0;
+      const height = sequenceRef.current?.getBoundingClientRect().height ?? 0;
       const normalizedHeight = Math.round(height * 1000) / 1000;
       if (sequenceHeightRef.current !== normalizedHeight) {
         sequenceHeightRef.current = normalizedHeight;
         scrollContainerRef.current?.style.setProperty(
           "--sequence-height",
-          `${normalizedHeight}px`
+          `${normalizedHeight}px`,
         );
       }
     };
@@ -100,7 +100,10 @@ const VerticalBillboard: React.FC<VerticalBillboardProps> = ({
   const slides = useMemo(
     () =>
       images.map((image, index) => (
-        <div className="vertical-billboard-slide w-full" key={`${image}-${index}`}>
+        <div
+          className="vertical-billboard-slide w-full"
+          key={`${image}-${index}`}
+        >
           <img
             src={image}
             alt={`Slide ${index}`}
@@ -110,13 +113,16 @@ const VerticalBillboard: React.FC<VerticalBillboardProps> = ({
           />
         </div>
       )),
-    [images]
+    [images],
   );
 
   const clonedSlides = useMemo(
     () =>
       images.map((image, index) => (
-        <div className="vertical-billboard-slide w-full" key={`${image}-clone-${index}`}>
+        <div
+          className="vertical-billboard-slide w-full"
+          key={`${image}-clone-${index}`}
+        >
           <img
             src={image}
             alt={`Slide ${index % images.length}`}
@@ -126,7 +132,7 @@ const VerticalBillboard: React.FC<VerticalBillboardProps> = ({
           />
         </div>
       )),
-    [images]
+    [images],
   );
 
   if (!images.length) return null;
@@ -135,7 +141,7 @@ const VerticalBillboard: React.FC<VerticalBillboardProps> = ({
     ? "max(0px, calc((100vw - var(--w3-app-max-width)) / 2))"
     : "0px";
 
-  return (
+  const billboard = (
     <div
       className="fixed top-0 h-screen w-1/2 sm:w-1/4"
       style={{ left: billboardLeftOffset }}
@@ -146,9 +152,7 @@ const VerticalBillboard: React.FC<VerticalBillboardProps> = ({
         togglePause();
       }}
     >
-      <div
-        className="vertical-billboard overflow-hidden h-full"
-      >
+      <div className="vertical-billboard overflow-hidden h-full">
         <div
           ref={scrollContainerRef}
           className={`relative scroll-container ${isReady ? "animating" : ""} ${
@@ -176,7 +180,9 @@ const VerticalBillboard: React.FC<VerticalBillboardProps> = ({
       </div>
       <div
         className={`absolute inset-0 flex items-center justify-center transition-opacity duration-300 bg-black/40 cursor-pointer ${
-          isHovering || isPaused ? "opacity-100" : "opacity-0 pointer-events-none"
+          isHovering || isPaused
+            ? "opacity-100"
+            : "opacity-0 pointer-events-none"
         }`}
         onClick={togglePause}
         onTouchEnd={(e) => {
@@ -194,6 +200,10 @@ const VerticalBillboard: React.FC<VerticalBillboardProps> = ({
       </div>
     </div>
   );
+
+  // Portal so the billboard escapes the LowResolution
+  // transform optin and stays fixed to the real viewport.
+  return createPortal(billboard, document.body);
 };
 
 export default VerticalBillboard;

@@ -32,13 +32,24 @@ export function OptionsAccordion({
   optionKeys,
 }: OptionsAccordionProps) {
   return (
-    <Accordion type="multiple" value={openItems} onValueChange={onOpenItemsChange}>
+    <Accordion
+      type="multiple"
+      value={openItems}
+      onValueChange={onOpenItemsChange}
+    >
       {optionKeys.map((key) => (
-        <AccordionItem key={key} value={key}>
+        <AccordionItem
+          key={key}
+          value={key}
+          className={key === "lowResolution" ? "hidden md:block" : undefined}
+        >
           <AccordionTrigger
             className={`transition-opacity ${!draft[key] ? "opacity-40" : ""}`}
             action={
-              <SettingsToggle checked={draft[key]} onToggle={() => onToggle(key)} />
+              <SettingsToggle
+                checked={draft[key]}
+                onToggle={() => onToggle(key)}
+              />
             }
           >
             <span className="flex flex-1 max-w-[340px] items-center gap-2 text-left uppercase text-xs font-extrabold tracking-wide text-white">
@@ -51,7 +62,7 @@ export function OptionsAccordion({
             </span>
           </AccordionTrigger>
           <AccordionContent>
-            <p className="max-w-[340px] pr-16 sm:pr-0 pl-5 text-xs uppercase font-bold text-body">
+            <p className="max-w-[340px] pr-16 sm:pr-0 pl-5 text-xs uppercase font-bold text-body text-pretty">
               {OPTION_DESCRIPTIONS[key]}
             </p>
           </AccordionContent>

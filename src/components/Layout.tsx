@@ -1,6 +1,7 @@
 import { Outlet, useLocation } from "react-router-dom";
 import { OptionsProvider } from "@/providers/OptionsProvider";
 import { PageProvider } from "@/providers/PageProvider";
+import CRTEffects from "@/providers/CRTEffects";
 import { usePage } from "@/hooks/usePage";
 import { useOptions } from "@/hooks/useOptions";
 import AppContainer from "./AppContainer";
@@ -45,13 +46,15 @@ function LayoutContent() {
   }, [pathname]);
 
   return (
-    <AppContainer className="h-full flex flex-col">
-      <main ref={mainRef} className="flex-1 overflow-auto min-h-0">
-        <div className={`w-full h-full px-6 py-6 ${wideCenter ? "w3-app-max-width mx-auto" : ""}`}>
-          <Outlet />
-        </div>
-      </main>
-      {!isFooterHidden && <Footer />}
-    </AppContainer>
+    <CRTEffects>
+      <AppContainer className="h-full flex flex-col">
+        <main ref={mainRef} className="flex-1 overflow-auto min-h-0">
+          <div className={`w-full h-full px-6 py-6 ${wideCenter ? "w3-app-max-width mx-auto" : ""}`}>
+            <Outlet />
+          </div>
+        </main>
+        {!isFooterHidden && <Footer />}
+      </AppContainer>
+    </CRTEffects>
   );
 }
