@@ -64,7 +64,7 @@ export const OPTION_LABELS: Record<OptionKey, string> = {
   countdownToggle: "News: Countdown Accessibility",
   modal: "Modal Overlays",
   reactEditionCredits: "React Edition Credits",
-  contactModal: "Contact Form Modal",
+  contactModal: "Contact: Developer Modal Form",
   swipeHints: "Swipe Hints (Touch devices only)",
   remapL: "Remap 'L' Glyph",
   wideCenter: "Widescreen: Center Content",
