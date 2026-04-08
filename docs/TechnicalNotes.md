@@ -15,6 +15,16 @@ The resolved CSS is injected as a `<style>` tag prepended to `<head>`. It contai
 
 Because the values are derived from the actual CSS and constants files, adding or modifying a theme in `index.css` is automatically reflected in the injected block with no manual updates required.
 
+## Animation Performance
+
+CSS animations are driven by `transform` and `opacity` exclusively, keeping all motion on the GPU compositor thread and avoiding layout or paint work.
+
+`will-change: transform` is applied to elements that animate on a recurring basis (e.g. marquees, hover transitions, icon cycling) so the browser can promote them to their own compositor layer ahead of time.
+
+JavaScript-driven animations use `requestAnimationFrame` rather than `setInterval` or `setTimeout`, ensuring frame timing aligns with the display refresh rate.
+
+Heavy or off-screen animations (e.g. the 2097/XL vertical marquee, banner videos) are paused when they leave the viewport via `IntersectionObserver`, freeing compositor resources for on-screen content.
+
 ## Touch Navigation Modes
 
 Menu links on touch devices support two navigation modes, implemented in `src/components/WipeoutLink/WipeoutLink.tsx`.
