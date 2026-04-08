@@ -25,6 +25,8 @@ type WipeoutLinkBaseProps = {
   onClick?: (event: MouseEvent<HTMLAnchorElement | HTMLButtonElement>) => void;
 };
 
+const isExternalUrl = (url: string) => /^[a-z][a-z\d+\-.]*:/i.test(url);
+
 type WipeoutLinkAsLink = WipeoutLinkBaseProps & {
   as?: "link";
   to: string;
@@ -128,12 +130,15 @@ export const WipeoutLink: FC<WipeoutLinkProps> = ({
       return;
     }
 
+    const isExternal = as === "link" && !!toRef.current && isExternalUrl(toRef.current);
+
     // Branch 1 — Wait-for-animation (default touch mode when animations are enabled)
     if (
       touchOriginatedRef.current &&
       !reducedMotion &&
       !disableHoverAnimations &&
-      animationData
+      animationData &&
+      !isExternal
     ) {
       touchOriginatedRef.current = false;
       e.preventDefault();
@@ -171,17 +176,29 @@ export const WipeoutLink: FC<WipeoutLinkProps> = ({
         onEnded={handleAnimationEnded}
       />
       {as === "link" ? (
-        <Link
-          {...(props as LinkProps)}
-          to={props.to as string}
-          className={className}
-          style={isWaitingForAnimation ? activeStyle : undefined}
-          onTouchStart={handleTouchStart}
-          onClick={handleClick}
-          tabIndex={0}
-        >
-          {children}
-        </Link>
+        isExternalUrl(props.to as string) ? (
+          <a
+            href={props.to as string}
+            className={className}
+            onTouchStart={handleTouchStart}
+            onClick={handleClick}
+            tabIndex={0}
+          >
+            {children}
+          </a>
+        ) : (
+          <Link
+            {...(props as LinkProps)}
+            to={props.to as string}
+            className={className}
+            style={isWaitingForAnimation ? activeStyle : undefined}
+            onTouchStart={handleTouchStart}
+            onClick={handleClick}
+            tabIndex={0}
+          >
+            {children}
+          </Link>
+        )
       ) : (
         <button
           {...(props as ButtonProps)}
