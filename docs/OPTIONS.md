@@ -29,6 +29,8 @@ When active, Pure Mode applies the following overrides:
 | `swipeHints`             | `false`    | Swipe hints disabled                       |
 | `wideCenter`             | `false`    | Widescreen centering disabled              |
 | `xsText`                 | `true`     | Extra-small text as it originally appeared |
+| `scanlineFilter1`        | `true`     | CRT filter enabled                         |
+| `lowResolution`          | `true`     | CRT 800×600 scaling enabled                |
 
 > [!NOTE]
 > When Pure Mode is active, individual option toggles are locked. To customize individual options, disable Pure Mode first.
@@ -52,6 +54,8 @@ When active, React Mode applies the following overrides:
 | `swipeHints`             | `true`      | Swipe hints enabled                        |
 | `wideCenter`             | `false`     | Widescreen centering disabled              |
 | `xsText`                 | `true`      | Extra-small text as it originally appeared |
+| `scanlineFilter1`        | `false`     | CRT filter disabled                        |
+| `lowResolution`          | `false`     | CRT 800×600 scaling disabled               |
 
 ## `bannersFlash`
 
@@ -159,6 +163,20 @@ Modals are always centered and capped at `1730px` regardless of this setting. Th
 ## `xsText`
 
 Enables small font sizes as they originally appeared on the Wipeout 3 Flash website, sacrificing legibility and accessibility on modern, higher resolution screens.
+
+## `scanlineFilter1`
+
+Applies a full-screen CRT monitor effect over the entire site. The effect includes:
+
+- **Scanlines** — horizontal interlaced lines
+- **Noise** — animated static grain
+- **Vignette** — darkened edges
+
+## `lowResolution`
+
+Resizes the screen to 800x600, emulating the fixed resolution of a period-accurate CRT monitor. Below the `md` breakpoint, scaling is bypassed and children render at their natural size.
+
+When `wideCenter` is active the 800×600 box is centered (pillarboxed) rather than anchored to the top-left corner.
 
 ## Technical Notes
 

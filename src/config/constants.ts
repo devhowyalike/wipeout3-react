@@ -22,5 +22,9 @@ export const GITHUB_PROFILE_URL = "https://github.com/devhowyalike";
 /** GitHub repository URL for the React Edition source code. */
 export const GITHUB_URL = "https://github.com/devhowyalike/wipeout3-react";
 
+/** Small-screen breakpoint (px), aligned with Tailwind's `sm`. */
+export const BREAKPOINT_SM = 640;
+/** Medium-screen breakpoint (px), aligned with Tailwind's `md`. */
+export const BREAKPOINT_MD = 768;
 /** Large-screen breakpoint (px), aligned with Tailwind's `lg`. */
 export const BREAKPOINT_LG = 1024;
