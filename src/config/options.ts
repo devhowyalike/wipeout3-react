@@ -63,8 +63,8 @@ export const MODE_DESCRIPTIONS: Record<"pureMode" | "reactMode", string> = {
 
 /** Short UI label for each option toggle, shown in the settings panel. */
 export const OPTION_LABELS: Record<OptionKey, string> = {
-  scanlineFilter1: "Scanline Filter",
   lowResolution: "Low Resolution",
+  scanlineFilter1: "Scanline Filter",
   psygnosisUrl: "Homepage: Psygnosis URL",
   bannersFlash: "Banners: Flash (via Ruffle)",
   xsText: "Small Text (original sizing)",
