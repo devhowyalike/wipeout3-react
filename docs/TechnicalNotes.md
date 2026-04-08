@@ -15,6 +15,12 @@ The resolved CSS is injected as a `<style>` tag prepended to `<head>`. It contai
 
 Because the values are derived from the actual CSS and constants files, adding or modifying a theme in `index.css` is automatically reflected in the injected block with no manual updates required.
 
+## Widescreen Layout Constraints
+
+Modals are always centered and capped at `1730px` regardless of the `wideCenter` setting, keeping the close button and content within a predictable area on any screen size.
+
+The footer bar is always capped at `1730px` to keep the navigation controls, sound toggle, and settings button accessible on ultra-wide screens, but is only centered when `wideCenter` is enabled.
+
 ## Animation Performance
 
 CSS animations are driven by `transform` and `opacity` exclusively, keeping all motion on the GPU compositor thread and avoiding layout or paint work.

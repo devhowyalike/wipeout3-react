@@ -30,8 +30,6 @@ Most improvements are enabled by default. Where a change represents an opinionat
 - Widescreen monitor support
   - An optional [`wideCenter`](OPTIONS.md#widecenter) setting centers the main content within a `1730px` max-width column on wide monitors.
     - When disabled (default), the main content area has no maximum width and stretches naturally to fill the viewport, preserving the original Flash website's full-width layout.
-  - Modals are always centered and capped at `1730px` regardless of the `wideCenter` setting, keeping the close button and content within a predictable area on any screen size.
-  - The footer bar is always capped at `1730px` to keep the navigation controls, sound toggle, and settings button accessible on ultra-wide screens, but is only centered when `wideCenter` is enabled.
 
 - Animation boosts (targeting 60fps)
   - Animations across the site have been tuned for smoother, more fluid playback — targeting 60fps where doing so does not stray from the artistic intent of the original Flash website.
