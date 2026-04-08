@@ -40,6 +40,10 @@ Most improvements are enabled by default. Where a change represents an opinionat
   - JavaScript-driven animations use `requestAnimationFrame` rather than `setInterval` or `setTimeout`, ensuring frame timing aligns with the display refresh rate.
   - Heavy or off-screen animations (e.g. the 2097/XL vertical marquee, banner videos) are paused when they leave the viewport via `IntersectionObserver`, freeing compositor resources for on-screen content.
 
+- Retro display effects
+  - Added an optional CRT scanline filter ([`scanlineFilter1`](OPTIONS.md#scanlinefilter1)) that overlays the entire site with horizontal scanlines, animated noise grain, and a vignette.
+  - Added an optional low-resolution mode ([`lowResolution`](OPTIONS.md#lowresolution)) that scales the viewport to 800×600, emulating the fixed resolution of a period-accurate CRT monitor.
+
 - Footer navigation naming consistency
   - Updated the naming conventions of certain footer menu items to align with the rest of the website.
     - Sub-menu titles (e.g., "Pitlane Select," "History Select," etc.) are now consistently contextualized with their respective parent menu items.
