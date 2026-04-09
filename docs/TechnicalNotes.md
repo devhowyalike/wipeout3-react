@@ -21,6 +21,10 @@ Modals are always centered and capped at `1730px` regardless of the `wideCenter`
 
 The footer bar is always capped at `1730px` to keep the navigation controls, sound toggle, and settings button accessible on ultra-wide screens, but is only centered when `wideCenter` is enabled.
 
+## Modal Overlays Option
+
+The `modal` option toggle is hidden in the Options menu (`OptionsAccordion`) on breakpoints below `lg`, as these are likely touch-enabled viewport sizes where pop-up windows are not supported — modals are always used there regardless of the setting.
+
 ## Animation Performance
 
 CSS animations are driven by `transform` and `opacity` exclusively, keeping all motion on the GPU compositor thread and avoiding layout or paint work.
@@ -35,10 +39,10 @@ Heavy or off-screen animations (e.g. the 2097/XL vertical marquee, banner videos
 
 Menu links on touch devices support two navigation modes, implemented in `src/components/WipeoutLink/WipeoutLink.tsx`.
 
-| Mode | Trigger | Behavior |
-| ---- | ------- | --------- |
-| **Wait-for-animation** | Default | First tap plays the hover animation; navigation fires automatically when the animation ends. A second tap while the animation is playing skips the remainder and navigates immediately. |
-| **Immediate** | `disableHoverAnimations` option **or** `prefers-reduced-motion` | Taps navigate instantly with no animation. |
+| Mode                   | Trigger                                                         | Behavior                                                                                                                                                                                |
+| ---------------------- | --------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Wait-for-animation** | Default                                                         | First tap plays the hover animation; navigation fires automatically when the animation ends. A second tap while the animation is playing skips the remainder and navigates immediately. |
+| **Immediate**          | `disableHoverAnimations` option **or** `prefers-reduced-motion` | Taps navigate instantly with no animation.                                                                                                                                              |
 
 ## Converting Complex Flash Animations
 
@@ -54,11 +58,11 @@ For Flash animations that could not be faithfully reproduced as animated SVGs, a
 
 The script produces three output formats to cover cross-browser transparency support:
 
-| File | Codec | Notes |
-| ---- | ----- | ----- |
-| `output_alpha.webm` | VP9 | Best for web; Chrome and modern Safari |
-| `output_alpha.mov` | ProRes 4444 | Maximum Safari compatibility |
-| `output_alpha_hevc.mov` | HEVC | Apple-native; best quality/size ratio |
+| File                    | Codec       | Notes                                  |
+| ----------------------- | ----------- | -------------------------------------- |
+| `output_alpha.webm`     | VP9         | Best for web; Chrome and modern Safari |
+| `output_alpha.mov`      | ProRes 4444 | Maximum Safari compatibility           |
+| `output_alpha_hevc.mov` | HEVC        | Apple-native; best quality/size ratio  |
 
 **Requirements:** `ffmpeg` plus one SVG rasteriser — ImageMagick, Inkscape, or librsvg.
 
