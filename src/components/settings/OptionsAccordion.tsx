@@ -22,6 +22,11 @@ interface OptionsAccordionProps {
   optionKeys: OptionKey[];
 }
 
+const ITEM_CLASS: Partial<Record<OptionKey, string>> = {
+  lowResolution: "hidden md:block",
+  modal: MODAL_BREAKPOINT_CLASSES.hiddenBlock,
+};
+
 /**
  * Multi-open accordion listing app option toggles with labels and descriptions from config.
  */
@@ -42,14 +47,7 @@ export function OptionsAccordion({
         <AccordionItem
           key={key}
           value={key}
-          className={
-            key === "lowResolution"
-              ? "hidden md:block"
-              : // modal option hidden below breakpoint where pop-ups are unsupported
-                key === "modal"
-                ? MODAL_BREAKPOINT_CLASSES.hiddenBlock
-                : undefined
-          }
+          className={ITEM_CLASS[key]}
         >
           <AccordionTrigger
             className={`transition-opacity ${!draft[key] ? "opacity-40" : ""}`}
