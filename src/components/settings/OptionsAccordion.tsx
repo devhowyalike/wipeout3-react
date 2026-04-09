@@ -41,7 +41,11 @@ export function OptionsAccordion({
         <AccordionItem
           key={key}
           value={key}
-          className={key === "lowResolution" ? "hidden md:block" : undefined}
+          className={
+            key === "lowResolution" ? "hidden md:block" :
+            key === "modal" ? "hidden lg:block" :
+            undefined
+          }
         >
           <AccordionTrigger
             className={`transition-opacity ${!draft[key] ? "opacity-40" : ""}`}
