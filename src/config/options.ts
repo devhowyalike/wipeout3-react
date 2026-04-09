@@ -1,5 +1,17 @@
 const STORAGE_KEY = "wipeout3-options";
 
+/** Tailwind breakpoint at which the Modal Overlays option becomes visible (and pop-ups are supported). */
+export const MODAL_BREAKPOINT = "lg";
+
+/**
+ * Full Tailwind class strings derived from MODAL_BREAKPOINT.
+ * Stored as static strings so Tailwind's scanner can detect and generate them.
+ */
+export const MODAL_BREAKPOINT_CLASSES = {
+  hiddenBlock: "hidden lg:block",
+  hiddenInline: "hidden lg:inline",
+} as const;
+
 /** Union of all user-configurable option keys (excludes mode flags). */
 export type OptionKey =
   | "xsText"
@@ -32,7 +44,7 @@ export const OPTION_DESCRIPTIONS: Record<OptionKey, string> = {
   countdownToggle:
     "Shows a play/pause button on the News countdown for accessibility and sensitivity to motion.",
   modal:
-    "Replaces the Flash site's pop-up windows with modals. Pop-ups may be blocked by browsers in any case; mobile users always see modals since pop-ups are not supported.",
+    "Uses modal overlays instead of the original's pop-up windows, which may be blocked by your browser.",
   bannersFlash:
     "On the Banners page, animations are served via Flash, enabling the Ruffle emulator to load original Flash content instead of video replacements. May be blocked by ad blockers or browser policies.",
   reactEditionCredits:
@@ -57,8 +69,8 @@ export const OPTION_DESCRIPTIONS: Record<OptionKey, string> = {
 
 /** Short description for each mode preset, displayed in the settings panel. */
 export const MODE_DESCRIPTIONS: Record<"pureMode" | "reactMode", string> = {
-  pureMode: "Restores original Flash website configuration",
-  reactMode: "Activates default React Edition configuration",
+  pureMode: "Restores original Flash website configuration.",
+  reactMode: "Activates default React Edition configuration.",
 };
 
 /** Short UI label for each option toggle, shown in the settings panel. */

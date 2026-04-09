@@ -1,5 +1,10 @@
 import { ChevronDown } from "lucide-react";
-import { type AppOptions, MODE_DESCRIPTIONS } from "@/config/options";
+import {
+  type AppOptions,
+  MODE_DESCRIPTIONS,
+  MODAL_BREAKPOINT,
+  MODAL_BREAKPOINT_CLASSES,
+} from "@/config/options";
 import {
   Accordion,
   AccordionItem,
@@ -14,6 +19,19 @@ interface ModesAccordionProps {
   onOpenModeItemsChange: (items: string[]) => void;
   onPureModeToggle: () => void;
   onReactModeToggle: () => void;
+}
+
+function PopupBlockedNotice() {
+  if (!MODAL_BREAKPOINT) return null;
+  return (
+    <span
+      className={`${MODAL_BREAKPOINT_CLASSES.hiddenInline} font-normal opacity-60`}
+    >
+      {" — "}
+      Pop-up windows may be blocked by your browser. Enable "Modal Overlays" if
+      you experience issues.
+    </span>
+  );
 }
 
 /**
@@ -37,7 +55,10 @@ export function ModesAccordion({
           <AccordionTrigger
             className={`transition-all text-white ${draft.pureMode ? "" : "opacity-40"}`}
             action={
-              <SettingsToggle checked={draft.pureMode} onToggle={onPureModeToggle} />
+              <SettingsToggle
+                checked={draft.pureMode}
+                onToggle={onPureModeToggle}
+              />
             }
           >
             <span className="flex flex-1 max-w-[340px] items-center gap-2 text-left uppercase text-xs font-extrabold tracking-wide">
@@ -52,6 +73,7 @@ export function ModesAccordion({
           <AccordionContent>
             <p className="max-w-[340px] pr-16 sm:pr-4 pl-5 text-xs uppercase font-bold text-body">
               {MODE_DESCRIPTIONS.pureMode}
+              <PopupBlockedNotice />
             </p>
           </AccordionContent>
         </AccordionItem>
@@ -60,7 +82,10 @@ export function ModesAccordion({
           <AccordionTrigger
             className={`transition-all text-white ${draft.reactMode ? "" : "opacity-40"}`}
             action={
-              <SettingsToggle checked={draft.reactMode} onToggle={onReactModeToggle} />
+              <SettingsToggle
+                checked={draft.reactMode}
+                onToggle={onReactModeToggle}
+              />
             }
           >
             <span className="flex flex-1 max-w-[340px] items-center gap-2 text-left uppercase text-xs font-extrabold tracking-wide">

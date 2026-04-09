@@ -2,6 +2,7 @@ import { ChevronDown } from "lucide-react";
 import {
   type AppOptions,
   type OptionKey,
+  MODAL_BREAKPOINT_CLASSES,
   OPTION_LABELS,
   OPTION_DESCRIPTIONS,
 } from "@/config/options";
@@ -42,9 +43,12 @@ export function OptionsAccordion({
           key={key}
           value={key}
           className={
-            key === "lowResolution" ? "hidden md:block" :
-            key === "modal" ? "hidden lg:block" :
-            undefined
+            key === "lowResolution"
+              ? "hidden md:block"
+              : // modal option hidden below breakpoint where pop-ups are unsupported
+                key === "modal"
+                ? MODAL_BREAKPOINT_CLASSES.hiddenBlock
+                : undefined
           }
         >
           <AccordionTrigger
