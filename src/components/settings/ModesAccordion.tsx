@@ -25,7 +25,7 @@ function PopupBlockedNotice() {
   if (!MODAL_BREAKPOINT) return null;
   return (
     <span
-      className={`${MODAL_BREAKPOINT_CLASSES.hiddenInline} font-normal opacity-60`}
+      className={`${MODAL_BREAKPOINT_CLASSES.hiddenInline} font-normal opacity-80`}
     >
       {" — "}
       Pop-up windows may be blocked by your browser. Enable "Modal Overlays" if

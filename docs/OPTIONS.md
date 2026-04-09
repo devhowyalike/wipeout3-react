@@ -110,7 +110,7 @@ When `wideCenter` is active the 800×600 box is centered (pillarboxed) rather th
 
 Replaces pop-up windows with modals for a more modern, accessible experience.
 
-Setting to `false` will restore the original pop-up windows on the `lg` breakpoint only.
+Setting to `false` will restore the original pop-up windows on the `lg` breakpoint only. Below the `lg` breakpoint, modals are always used regardless of this setting.
 
 Most modern browsers block pop-up windows by default, degrading the user experience.
 
