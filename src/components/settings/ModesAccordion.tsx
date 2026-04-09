@@ -34,8 +34,43 @@ function PopupBlockedNotice() {
   );
 }
 
+interface ModeAccordionItemProps {
+  id: "reactMode" | "pureMode";
+  label: string;
+  checked: boolean;
+  openItems: string[];
+  onToggle: () => void;
+  notice?: React.ReactNode;
+}
+
+function ModeAccordionItem({ id, label, checked, openItems, onToggle, notice }: ModeAccordionItemProps) {
+  return (
+    <AccordionItem value={id}>
+      <AccordionTrigger
+        className={`transition-all text-white ${checked ? "" : "opacity-40"}`}
+        action={<SettingsToggle checked={checked} onToggle={onToggle} />}
+      >
+        <span className="flex flex-1 max-w-[340px] items-center gap-2 text-left uppercase text-xs font-extrabold tracking-wide">
+          <ChevronDown
+            className={`h-3 w-3 shrink-0 text-white/40 transition-transform duration-200 ${
+              openItems.includes(id) ? "rotate-180" : ""
+            }`}
+          />
+          <span>{label}</span>
+        </span>
+      </AccordionTrigger>
+      <AccordionContent>
+        <p className="max-w-[340px] pr-16 sm:pr-4 pl-5 text-xs uppercase font-bold text-body">
+          {MODE_DESCRIPTIONS[id]}
+          {notice}
+        </p>
+      </AccordionContent>
+    </AccordionItem>
+  );
+}
+
 /**
- * Settings accordion for Pure Mode and React Mode toggles plus their description copy.
+ * Settings accordion for React Mode and Pure Mode toggles plus their description copy.
  */
 export function ModesAccordion({
   draft,
@@ -51,58 +86,21 @@ export function ModesAccordion({
         value={openModeItems}
         onValueChange={onOpenModeItemsChange}
       >
-        <AccordionItem value="pureMode">
-          <AccordionTrigger
-            className={`transition-all text-white ${draft.pureMode ? "" : "opacity-40"}`}
-            action={
-              <SettingsToggle
-                checked={draft.pureMode}
-                onToggle={onPureModeToggle}
-              />
-            }
-          >
-            <span className="flex flex-1 max-w-[340px] items-center gap-2 text-left uppercase text-xs font-extrabold tracking-wide">
-              <ChevronDown
-                className={`h-3 w-3 shrink-0 text-white/40 transition-transform duration-200 ${
-                  openModeItems.includes("pureMode") ? "rotate-180" : ""
-                }`}
-              />
-              <span>Pure Mode</span>
-            </span>
-          </AccordionTrigger>
-          <AccordionContent>
-            <p className="max-w-[340px] pr-16 sm:pr-4 pl-5 text-xs uppercase font-bold text-body">
-              {MODE_DESCRIPTIONS.pureMode}
-              <PopupBlockedNotice />
-            </p>
-          </AccordionContent>
-        </AccordionItem>
-
-        <AccordionItem value="reactMode">
-          <AccordionTrigger
-            className={`transition-all text-white ${draft.reactMode ? "" : "opacity-40"}`}
-            action={
-              <SettingsToggle
-                checked={draft.reactMode}
-                onToggle={onReactModeToggle}
-              />
-            }
-          >
-            <span className="flex flex-1 max-w-[340px] items-center gap-2 text-left uppercase text-xs font-extrabold tracking-wide">
-              <ChevronDown
-                className={`h-3 w-3 shrink-0 text-white/40 transition-transform duration-200 ${
-                  openModeItems.includes("reactMode") ? "rotate-180" : ""
-                }`}
-              />
-              <span>React Mode</span>
-            </span>
-          </AccordionTrigger>
-          <AccordionContent>
-            <p className="max-w-[340px] pr-16 sm:pr-4 pl-5 text-xs uppercase font-bold text-body">
-              {MODE_DESCRIPTIONS.reactMode}
-            </p>
-          </AccordionContent>
-        </AccordionItem>
+        <ModeAccordionItem
+          id="reactMode"
+          label="React Mode"
+          checked={draft.reactMode}
+          openItems={openModeItems}
+          onToggle={onReactModeToggle}
+        />
+        <ModeAccordionItem
+          id="pureMode"
+          label="Pure Mode"
+          checked={draft.pureMode}
+          openItems={openModeItems}
+          onToggle={onPureModeToggle}
+          notice={<PopupBlockedNotice />}
+        />
       </Accordion>
     </div>
   );
