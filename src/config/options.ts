@@ -94,7 +94,7 @@ export const OPTION_LABELS: Record<OptionKey, string> = {
 /** Factory defaults applied when no persisted options exist in localStorage. */
 export const DEFAULT_OPTIONS: AppOptions = {
   pureMode: false,
-  reactMode: false,
+  reactMode: true,
   xsText: true,
   soundToggle: true,
   countdownToggle: true,
