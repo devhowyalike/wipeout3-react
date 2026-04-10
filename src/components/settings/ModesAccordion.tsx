@@ -43,7 +43,14 @@ interface ModeAccordionItemProps {
   notice?: React.ReactNode;
 }
 
-function ModeAccordionItem({ id, label, checked, openItems, onToggle, notice }: ModeAccordionItemProps) {
+function ModeAccordionItem({
+  id,
+  label,
+  checked,
+  openItems,
+  onToggle,
+  notice,
+}: ModeAccordionItemProps) {
   return (
     <AccordionItem value={id}>
       <AccordionTrigger
@@ -60,7 +67,7 @@ function ModeAccordionItem({ id, label, checked, openItems, onToggle, notice }: 
         </span>
       </AccordionTrigger>
       <AccordionContent>
-        <p className="max-w-[340px] pr-16 sm:pr-4 pl-5 text-xs uppercase font-bold text-body">
+        <p className="max-w-[340px] pr-16 sm:pr-4 pl-5 text-xs uppercase font-bold text-body text-pretty">
           {MODE_DESCRIPTIONS[id]}
           {notice}
         </p>
