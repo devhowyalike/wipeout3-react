@@ -69,8 +69,8 @@ export const OPTION_DESCRIPTIONS: Record<OptionKey, string> = {
 
 /** Short description for each mode preset, displayed in the settings panel. */
 export const MODE_DESCRIPTIONS: Record<"pureMode" | "reactMode", string> = {
-  pureMode: "Restores original Flash website configuration.",
-  reactMode: "Activates default configuration.",
+  reactMode: "Default settings with modern enhancements applied.",
+  pureMode: "Recreates the original 1999 website experience.",
 };
 
 /** Short UI label for each option toggle, shown in the settings panel. */

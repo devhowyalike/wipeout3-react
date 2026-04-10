@@ -6,9 +6,31 @@ Options cover the quality of life improvements in wipeout3.com: React Edition th
 
 The Options menu is accessible via the settings icon in the UI. It displays all toggleable options as labelled on/off switches.
 
-- **Pure Mode** and **React Mode** appear as presets at the bottom of the panel. When a preset is active, individual toggles are disabled.
+- **React Mode** and **Pure Mode** appear as presets at the bottom of the panel. When a preset is active, individual toggles are disabled.
 - Clicking **Apply** saves the current configuration to `localStorage` and reloads the page.
 - Clicking **Cancel**, pressing `Escape`, or clicking the overlay closes the menu without saving.
+
+## React Mode
+
+React Mode is a preset that activates the default React Edition configuration. It is the counterpart to Pure Mode — the two are mutually exclusive, and enabling one disables the other.
+
+When active, React Mode applies the following overrides:
+
+| Option                   | React Value | Effect                                     |
+| ------------------------ | ----------- | ------------------------------------------ |
+| `bannersFlash`           | `false`     | MP4 video banners instead of Flash         |
+| `contactModal`           | `true`      | Contact form modal instead of mailto: link |
+| `countdownToggle`        | `true`      | Countdown pause button visible             |
+| `disableHoverAnimations` | `false`     | Hover animations enabled                   |
+| `lowResolution`          | `false`     | CRT 800×600 scaling disabled               |
+| `modal`                  | `true`      | Modals instead of pop-up windows           |
+| `reactEditionCredits`    | `true`      | React Edition credits visible              |
+| `remapL`                 | `false`     | "l" / "L" remapping disabled               |
+| `scanlineFilter1`        | `false`     | CRT filter disabled                        |
+| `soundToggle`            | `true`      | Sound toggle visible                       |
+| `swipeHints`             | `true`      | Swipe hints enabled                        |
+| `wideCenter`             | `false`     | Widescreen centering disabled              |
+| `xsText`                 | `true`      | Extra-small text as it originally appeared |
 
 ## Pure Mode
 
@@ -34,28 +56,6 @@ When active, Pure Mode applies the following overrides:
 
 > [!NOTE]
 > When Pure Mode is active, individual option toggles are locked. To customize individual options, disable Pure Mode first.
-
-## React Mode
-
-React Mode is a preset that activates the default React Edition configuration. It is the counterpart to Pure Mode — the two are mutually exclusive, and enabling one disables the other.
-
-When active, React Mode applies the following overrides:
-
-| Option                   | React Value | Effect                                     |
-| ------------------------ | ----------- | ------------------------------------------ |
-| `bannersFlash`           | `false`     | MP4 video banners instead of Flash         |
-| `contactModal`           | `true`      | Contact form modal instead of mailto: link |
-| `countdownToggle`        | `true`      | Countdown pause button visible             |
-| `disableHoverAnimations` | `false`     | Hover animations enabled                   |
-| `lowResolution`          | `false`     | CRT 800×600 scaling disabled               |
-| `modal`                  | `true`      | Modals instead of pop-up windows           |
-| `reactEditionCredits`    | `true`      | React Edition credits visible              |
-| `remapL`                 | `false`     | "l" / "L" remapping disabled               |
-| `scanlineFilter1`        | `false`     | CRT filter disabled                        |
-| `soundToggle`            | `true`      | Sound toggle visible                       |
-| `swipeHints`             | `true`      | Swipe hints enabled                        |
-| `wideCenter`             | `false`     | Widescreen centering disabled              |
-| `xsText`                 | `true`      | Extra-small text as it originally appeared |
 
 ## `bannersFlash`
 
