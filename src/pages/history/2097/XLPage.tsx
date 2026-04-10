@@ -16,6 +16,12 @@ export default function XLPage() {
 
   return (
     <Page theme="whiteTheme" documentTitle="History | 2097/XL" isFooterHidden>
+      {/*
+        VerticalBillboard portals its content to document.body (to escape the
+        LowResolution CSS transform context), leaving <main> empty. The sr-only
+        heading gives VoiceOver something to announce on route-change focus.
+      */}
+      <h1 className="sr-only">Wipeout 2097 / XL history</h1>
       <VerticalBillboard images={imageUrls} interval={5000} />
     </Page>
   );

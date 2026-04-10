@@ -40,9 +40,20 @@ function LayoutContent() {
 
   // Reset scroll and focus on route change so screen readers (VoiceOver, etc.)
   // announce the new page instead of leaving focus on a stale or removed element.
+  // Prefer focusing the first <h1> inside <main> so VoiceOver reads the page
+  // heading text immediately, rather than just announcing the landmark and
+  // requiring the user to navigate forward to hear any content.
   useEffect(() => {
-    if (mainRef.current) {
-      mainRef.current.scrollTop = 0;
+    if (!mainRef.current) return;
+    mainRef.current.scrollTop = 0;
+    const h1 = mainRef.current.querySelector<HTMLElement>("h1");
+    if (h1) {
+      // tabIndex=-1 lets us focus it programmatically without adding it to the
+      // Tab order. Only set it if not already present so we don't stomp on
+      // any intentional tabIndex the page placed on the heading.
+      if (!h1.hasAttribute("tabindex")) h1.setAttribute("tabindex", "-1");
+      h1.focus({ preventScroll: true });
+    } else {
       mainRef.current.focus({ preventScroll: true });
     }
   }, [pathname]);

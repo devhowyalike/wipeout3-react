@@ -22,6 +22,16 @@ export default function WipeoutPage() {
       isFooterHidden
       className="w-full"
     >
+      {/*
+        The heading is visually hidden but gives VoiceOver something to
+        announce when focus lands on <main> during route changes. Without it,
+        <main> is empty because the image is portalled outside it (necessary
+        to escape the LowResolution CSS transform context so the fixed
+        positioning works correctly relative to the real viewport).
+      */}
+      <h1 className="sr-only">
+        FE600 Anti-Gravity Racing League — Original Wipeout history
+      </h1>
       {/* Portal so the image escapes the LowResolution
           option container and stays fixed to the real viewport. */}
       {createPortal(imageLayer, document.body)}

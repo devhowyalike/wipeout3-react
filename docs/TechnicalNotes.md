@@ -154,17 +154,31 @@ This design keeps Escape behaviour composable across nested dialogs without each
 
 ### Route-Change Focus Management
 
-On every pathname change, `Layout` resets the scroll position of `<main>` and moves focus to it:
+On every pathname change, `Layout` resets the scroll position of `<main>` and moves focus into the new page:
 
 ```ts
 mainRef.current.scrollTop = 0;
-mainRef.current.focus({ preventScroll: true });
+const h1 = mainRef.current.querySelector("h1");
+if (h1) {
+  if (!h1.hasAttribute("tabindex")) h1.setAttribute("tabindex", "-1");
+  h1.focus({ preventScroll: true });
+} else {
+  mainRef.current.focus({ preventScroll: true });
+}
 ```
 
-`<main>` carries `tabIndex={-1}` so it accepts programmatic focus without appearing in the Tab order. Moving focus here on navigation serves two purposes:
+Focus is preferred on the first `<h1>` inside `<main>` rather than `<main>` itself. When VoiceOver focuses a landmark (`<main>`), it announces only the landmark type — the user then has to navigate forward to hear any content. When VoiceOver focuses an `<h1>`, it reads the heading text immediately, giving the user a spoken page title on every navigation.
 
-1. **Screen reader announcement** — VoiceOver and other assistive technologies announce the new page context when focus lands on `<main>`, rather than leaving it on a stale or removed element from the previous route.
+`<main>` still carries `tabIndex={-1}` as a fallback for two cases:
+
+1. **Pages without an `<h1>`** — focus lands on `<main>` directly.
 2. **Modal fallback target** — when a modal's original opener unmounts while the dialog is open (e.g. navigating away during a modal), `useShowModal`'s teardown falls back to `document.querySelector("main")` for focus restoration rather than dropping focus on `<body>`.
+
+#### Pages that portal their content out of `<main>`
+
+Some pages (`WipeoutPage`, `XLPage`) render their visible content via `createPortal` / `VerticalBillboard` so it escapes the `LowResolution` CSS `scale()` transform context and stays correctly positioned relative to the real viewport. This leaves `<main>` with no rendered children, so VoiceOver would announce "empty main" after a route change.
+
+Each such page adds a visually-hidden `<h1 className="sr-only">` as the first child. The heading is invisible but present in the accessibility tree, so `Layout`'s focus logic finds it and VoiceOver reads the page title on arrival.
 
 ## Converting Complex Flash Animations
 
