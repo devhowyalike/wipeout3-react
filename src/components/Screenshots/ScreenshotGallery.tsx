@@ -35,6 +35,9 @@ const ScreenshotGallery = () => {
   const touchStartXRef = useRef<number | null>(null);
   const touchEndXRef = useRef<number | null>(null);
   const galleryRef = useRef<HTMLDivElement>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
+  // Set when navigating back so the useEffect can focus the first menu button.
+  const shouldFocusMenuRef = useRef(false);
 
   // Swipe hint + live drag direction feedback
   // (pointer: coarse) is true on touch-primary devices (phones/tablets), false on mouse/trackpad
@@ -74,6 +77,13 @@ const ScreenshotGallery = () => {
 
   // Handle going back to the main menu
   const handleBackToMenu = useCallback(() => {
+    // Park focus on the nearest dialog before the currently-focused button
+    // unmounts. Without this, the browser moves focus to <body>, which is
+    // inert behind the top-layer backdrop, and macOS escalates it to the
+    // browser chrome.
+    const dialog = galleryRef.current?.closest("dialog");
+    if (dialog instanceof HTMLElement) dialog.focus();
+    shouldFocusMenuRef.current = true;
     setCurrentScreen(null);
   }, []);
 
@@ -235,6 +245,16 @@ const ScreenshotGallery = () => {
     handleBackToMenu,
   ]);
 
+  // After returning to the menu, move focus to the first menu button so it
+  // stays inside the dialog rather than landing on the dialog container.
+  useEffect(() => {
+    if (currentScreen !== null || !shouldFocusMenuRef.current) return;
+    shouldFocusMenuRef.current = false;
+    requestAnimationFrame(() => {
+      menuRef.current?.querySelector<HTMLElement>("button")?.focus();
+    });
+  }, [currentScreen]);
+
   const currentScreenId = currentScreen?.id;
 
   // Show swipe hint whenever user opens a screenshot set (touch devices only, not during active swiping)
@@ -309,7 +329,7 @@ const ScreenshotGallery = () => {
   // Main menu view
   if (!currentScreen) {
     return (
-      <div className="bg-screenshot space-y-[3px]">
+      <div ref={menuRef} className="bg-screenshot space-y-[3px]">
         {screenshotsData.screenshots.map((item, index) => (
           <button
             key={item.id}
