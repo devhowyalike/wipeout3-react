@@ -311,18 +311,19 @@ const ScreenshotGallery = () => {
     return (
       <div className="bg-screenshot space-y-[3px]">
         {screenshotsData.screenshots.map((item, index) => (
-          <div
+          <button
             key={item.id}
             onClick={() => handleSelectScreen(item, index)}
-            className="cursor-pointer"
+            aria-label={`View ${item.name} screenshots`}
+            className="block w-full cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-1"
           >
             <img
               src={getTitleCardImage(item.titleCard)}
-              alt={item.name}
+              alt=""
               loading="lazy"
               decoding="async"
             />
-          </div>
+          </button>
         ))}
       </div>
     );
@@ -331,12 +332,16 @@ const ScreenshotGallery = () => {
   // Screenshot viewer
   return (
     <div ref={galleryRef}>
-      <div onClick={handleBackToMenu} className="cursor-pointer">
+      <button
+        onClick={handleBackToMenu}
+        aria-label={`Back to screenshot menu (currently viewing ${currentScreen.name})`}
+        className="block w-full cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-1"
+      >
         <img
           src={getTitleCardImage(currentScreen.titleCard)}
-          alt={`${currentScreen.name} title card`}
+          alt=""
         />
-      </div>
+      </button>
 
       {/* Screenshot display */}
       <div
@@ -417,10 +422,13 @@ const ScreenshotGallery = () => {
           <div className="flex flex-col">
             <div className="flex">
               <button
-                className="cursor-pointer"
+                aria-label="Previous screenshot"
+                className="cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-1"
                 onClick={handlePrevClick}
                 onMouseEnter={() => handlePrevHover(true)}
                 onMouseLeave={() => handlePrevHover(false)}
+                onFocus={() => handlePrevHover(true)}
+                onBlur={() => handlePrevHover(false)}
               >
                 <img
                   src={
@@ -430,14 +438,17 @@ const ScreenshotGallery = () => {
                       ? uiMap.ltab_on
                       : uiMap.ltab_off
                   }
-                  alt="Previous"
+                  alt=""
                 />
               </button>
               <button
-                className="cursor-pointer"
+                aria-label="Next screenshot"
+                className="cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-1"
                 onClick={handleNextClick}
                 onMouseEnter={() => handleNextHover(true)}
                 onMouseLeave={() => handleNextHover(false)}
+                onFocus={() => handleNextHover(true)}
+                onBlur={() => handleNextHover(false)}
               >
                 <img
                   src={
@@ -447,25 +458,20 @@ const ScreenshotGallery = () => {
                       ? uiMap.rtab_on
                       : uiMap.rtab_off
                   }
-                  alt="Next"
+                  alt=""
                 />
               </button>
             </div>
             <button
+              aria-label="Back to menu"
+              className="cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-1"
               onClick={handleBackToMenu}
               onMouseEnter={() => handleMenuHover(true)}
               onMouseLeave={() => handleMenuHover(false)}
+              onFocus={() => handleMenuHover(true)}
+              onBlur={() => handleMenuHover(false)}
             >
-              <img
-                src={getNavImage()}
-                alt={
-                  uiState.prevHovered || uiState.prevKeyActive
-                    ? "Previous"
-                    : uiState.nextHovered || uiState.nextKeyActive
-                      ? "Next"
-                      : "Menu"
-                }
-              />
+              <img src={getNavImage()} alt="" />
             </button>
           </div>
         </div>
