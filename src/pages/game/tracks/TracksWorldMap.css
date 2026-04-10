@@ -2,14 +2,30 @@
   cursor: pointer;
 }
 
+.track-group[tabindex] {
+  cursor: pointer;
+}
+
+.track-group[tabindex]:focus {
+  outline: none;
+}
+
 .track-text {
   display: none;
 }
 
-.track-group:hover .track-linked {
+.track-group:hover .track-linked,
+.track-group:focus .track-linked,
+.track-group:focus-within .track-linked {
   fill: var(--color-heading-1);
 }
 
-.track-group:hover .track-text {
+.track-group:hover .track-text,
+.track-group:focus .track-text,
+.track-group:focus-within .track-text {
   display: block;
+}
+
+.track-group:focus-visible .track-linked {
+  filter: drop-shadow(0 0 3px white);
 }
