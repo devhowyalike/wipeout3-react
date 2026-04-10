@@ -16,7 +16,11 @@ export const DeveloperDetails = ({
   const displayDeveloper = developer || teamMembers[0];
 
   return (
-    <div className="mt-4" aria-live="polite" aria-atomic="true">
+    // aria-hidden: the details panel is a visual complement to the icon buttons.
+    // Each button's aria-label already announces the developer's name and title,
+    // so a live region here would double-announce on focus and read nothing new.
+    // Screen reader users can still navigate here manually; it just won't interrupt.
+    <div className="mt-4" aria-hidden="true">
       <div className="grid grid-cols-[1fr,1fr,45px] sm:grid-cols-[45px_1fr_45px_1fr_30px_115px] text-w3-sm font-bold max-w-[550px] gap-y-0.5">
         {/* Headers */}
         <div className="text-body uppercase text-w3-xs font-bold items-start sm:row-start-1">

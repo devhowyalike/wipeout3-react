@@ -12,6 +12,10 @@ export default function DevelopersPage() {
     (typeof teamMembers)[0] | null
   >(null);
 
+  const handleHover = (developer: (typeof teamMembers)[0] | null) => {
+    setHoveredDeveloper(developer);
+  };
+
   return (
     <Page
       theme="pinkTheme"
@@ -31,10 +35,7 @@ export default function DevelopersPage() {
           </span>
         }
       >
-        <DeveloperIconLayout
-          onHover={setHoveredDeveloper}
-          cycleEnabled={true}
-        />
+        <DeveloperIconLayout onHover={handleHover} cycleEnabled={true} />
       </BorderedTable>
 
       <DeveloperDetails developer={hoveredDeveloper} />
