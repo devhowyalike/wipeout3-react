@@ -24,6 +24,7 @@ export function DisclaimerModal() {
   return (
     <BaseDialog
       data-theme="sandTheme"
+      initialFocus="first-control"
       aria-labelledby={HEADING_ID}
       className="bg-page/98 overflow-auto flex items-center justify-center px-6 py-8"
     >

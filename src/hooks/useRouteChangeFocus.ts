@@ -13,9 +13,10 @@ export function useRouteChangeFocus(
   pathname: string,
 ) {
   useEffect(() => {
-    if (!containerRef.current) return;
-    containerRef.current.scrollTop = 0;
-    const h1 = containerRef.current.querySelector<HTMLElement>("h1");
+    const container = containerRef.current;
+    if (!container) return;
+    container.scrollTo({ top: 0 });
+    const h1 = container.querySelector<HTMLElement>("h1");
     if (h1) {
       // tabIndex=-1 lets us focus it programmatically without adding it to the
       // Tab order. Only set it if not already present so we don't stomp on
@@ -23,7 +24,7 @@ export function useRouteChangeFocus(
       if (!h1.hasAttribute("tabindex")) h1.setAttribute("tabindex", "-1");
       h1.focus({ preventScroll: true });
     } else {
-      containerRef.current.focus({ preventScroll: true });
+      container.focus({ preventScroll: true });
     }
   }, [pathname]); // eslint-disable-line react-hooks/exhaustive-deps
 }

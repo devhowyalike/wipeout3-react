@@ -1,8 +1,9 @@
-interface AngledButtonProps {
-  onClick: () => void;
+import type { ComponentPropsWithoutRef, ReactNode } from "react";
+
+interface AngledButtonProps
+  extends Omit<ComponentPropsWithoutRef<"button">, "children"> {
   variant: "primary" | "secondary";
-  disabled?: boolean;
-  children: React.ReactNode;
+  children: ReactNode;
 }
 
 const VARIANT_CLASSES = {
@@ -12,17 +13,22 @@ const VARIANT_CLASSES = {
 
 /** Compact angled-corner action button with primary (accent) and secondary (muted) variants. */
 export function AngledButton({
-  onClick,
   variant,
-  disabled,
+  type = "button",
   children,
+  className,
+  ...buttonProps
 }: AngledButtonProps) {
   return (
     <button
-      type="button"
-      onClick={onClick}
-      disabled={disabled}
-      className="group h-7 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+      type={type}
+      className={[
+        "group h-7 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed",
+        className,
+      ]
+        .filter(Boolean)
+        .join(" ")}
+      {...buttonProps}
     >
       <span
         className={`h-full inline-flex items-center angled-corner-sm px-6 uppercase text-xs font-extrabold tracking-wide transition-colors ${VARIANT_CLASSES[variant]}`}

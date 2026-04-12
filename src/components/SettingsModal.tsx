@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { useEscapeKey } from "./useEscapeKey";
 import {
   type AppOptions,
@@ -39,6 +39,7 @@ export default function SettingsModal({
   options,
   onClose,
 }: SettingsModalProps) {
+  const headingFocusRef = useRef<HTMLHeadingElement>(null);
   const [draft, setDraft] = useState<AppOptions>({ ...options });
   // Mode descriptions (Pure / React Mode) are expanded by default
   // to surface them on first visit. Overridden by the user's preference.
@@ -159,6 +160,7 @@ export default function SettingsModal({
     <BaseDialog
       closeOnBackdrop
       onClose={handleRequestClose}
+      initialFocusRef={headingFocusRef}
       aria-labelledby={HEADING_ID}
       className="bg-page"
       data-overlay="true"
@@ -174,12 +176,13 @@ export default function SettingsModal({
           >
             <div ref={headerRef} className="mb-6 shrink-0">
               <div className="max-w-[340px]">
-                <span
+                <h2
+                  ref={headingFocusRef}
                   id={HEADING_ID}
                   className="uppercase text-nav font-wipeout3 text-w3-fluid-xl tracking-wide"
                 >
                   Options
-                </span>
+                </h2>
               </div>
             </div>
 

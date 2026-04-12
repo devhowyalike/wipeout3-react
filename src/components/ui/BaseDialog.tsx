@@ -1,11 +1,16 @@
-import { useRef, type ComponentPropsWithoutRef } from "react";
+import { useRef, type ComponentPropsWithoutRef, type RefObject } from "react";
 import { createPortal } from "react-dom";
-import { useShowModal } from "@/hooks/useShowModal";
+import {
+  useShowModal,
+  type InitialFocusStrategy,
+} from "@/hooks/useShowModal";
 
 interface BaseDialogProps extends ComponentPropsWithoutRef<"dialog"> {
   portal?: boolean;
   closeOnBackdrop?: boolean;
   onClose?: () => void;
+  initialFocus?: InitialFocusStrategy;
+  initialFocusRef?: RefObject<HTMLElement | null>;
 }
 
 /**
@@ -17,12 +22,14 @@ export function BaseDialog({
   portal = true,
   closeOnBackdrop = false,
   onClose,
+  initialFocus,
+  initialFocusRef,
   onClick,
   children,
   ...rest
 }: BaseDialogProps) {
   const dialogRef = useRef<HTMLDialogElement>(null);
-  useShowModal(dialogRef);
+  useShowModal(dialogRef, { initialFocus, initialFocusRef });
 
   const handleClick = (e: React.MouseEvent<HTMLDialogElement>) => {
     if (closeOnBackdrop && e.target === e.currentTarget) {

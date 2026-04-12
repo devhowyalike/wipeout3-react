@@ -1,8 +1,47 @@
 import { useEffect, type RefObject } from "react";
 import { getLastInputModality } from "@/utils/inputModality";
 
+export type InitialFocusStrategy =
+  | "dialog"
+  | "first-control"
+  | "safe-action";
+
+interface UseShowModalOptions {
+  initialFocus?: InitialFocusStrategy;
+  initialFocusRef?: RefObject<HTMLElement | null>;
+}
+
 const FOCUSABLE =
   'button:not(:disabled), [href], input:not([type="hidden"]):not(:disabled), select:not(:disabled), textarea:not(:disabled), [tabindex]:not([tabindex="-1"])';
+const SAFE_ACTION = "[data-dialog-safe-action]";
+
+function prepareFocusTarget(target: HTMLElement | null) {
+  if (!target) return null;
+  if (!target.matches(FOCUSABLE) && !target.hasAttribute("tabindex")) {
+    target.setAttribute("tabindex", "-1");
+  }
+  return target;
+}
+
+function getInitialFocusTarget(
+  dialog: HTMLDialogElement,
+  initialFocus: InitialFocusStrategy,
+  initialFocusRef?: RefObject<HTMLElement | null>,
+) {
+  const explicitTarget = prepareFocusTarget(initialFocusRef?.current ?? null);
+  if (explicitTarget) return explicitTarget;
+
+  if (initialFocus === "safe-action") {
+    const target = dialog.querySelector<HTMLElement>(SAFE_ACTION);
+    if (target) return target;
+  }
+
+  if (initialFocus === "first-control") {
+    return dialog.querySelector<HTMLElement>(FOCUSABLE);
+  }
+
+  return dialog;
+}
 
 /**
  * Calls `.showModal()` on mount and `.close()` on cleanup, promoting the
@@ -20,7 +59,10 @@ const FOCUSABLE =
  * page-level navigation handler, without re-focusing pointer-triggered links
  * and buttons.
  */
-export function useShowModal(ref: RefObject<HTMLDialogElement | null>) {
+export function useShowModal(
+  ref: RefObject<HTMLDialogElement | null>,
+  { initialFocus = "dialog", initialFocusRef }: UseShowModalOptions = {},
+) {
   useEffect(() => {
     const dialog = ref.current;
     if (!dialog || dialog.open) return;
@@ -39,27 +81,29 @@ export function useShowModal(ref: RefObject<HTMLDialogElement | null>) {
     dialog.showModal();
 
     // Park focus on the dialog container first so VoiceOver registers the
-    // dialog context before we move to a child element.
-    dialog.tabIndex = -1;
+    // dialog context before we move to a more specific target.
+    dialog.setAttribute("tabindex", "-1");
     dialog.focus();
 
-    // Always move focus to the first interactive descendant. Per the ARIA APG
-    // dialog pattern, focus must land on an element inside the dialog on open.
+    const target = getInitialFocusTarget(dialog, initialFocus, initialFocusRef);
+    const shouldMoveFocus = target !== dialog;
+
     // setTimeout (not requestAnimationFrame) is required because VoiceOver
     // needs actual processing time — not just one paint frame — to absorb the
     // top-layer promotion before it will follow a focus change.
     // `:focus-visible` suppresses the ring on pointer-opened dialogs in all
     // browsers that this project targets (Chrome 86+, Firefox 85+, Safari 15.4+).
-    const focusTimer = setTimeout(() => {
-      const target = dialog.querySelector<HTMLElement>(FOCUSABLE);
-      if (target) target.focus();
-    }, 50);
+    const focusTimer = shouldMoveFocus
+      ? setTimeout(() => {
+          target?.focus();
+        }, 50)
+      : null;
 
     const preventCancel = (e: Event) => e.preventDefault();
     dialog.addEventListener("cancel", preventCancel);
 
     return () => {
-      clearTimeout(focusTimer);
+      if (focusTimer !== null) clearTimeout(focusTimer);
       dialog.removeEventListener("cancel", preventCancel);
 
       // If the browser still considers a dialog descendant focused, clear that
@@ -85,5 +129,5 @@ export function useShowModal(ref: RefObject<HTMLDialogElement | null>) {
         });
       }
     };
-  }, [ref]);
+  }, [initialFocus, initialFocusRef, ref]);
 }

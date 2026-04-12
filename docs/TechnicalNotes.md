@@ -100,24 +100,45 @@ This is done regardless of input modality because VoiceOver's navigation keys (V
 After `.showModal()`, focus is first parked on the dialog container so VoiceOver registers the new top-layer context:
 
 ```ts
-dialog.tabIndex = -1;
+dialog.setAttribute("tabindex", "-1");
 dialog.focus();
 ```
 
-Focus then moves to the `[autofocus]` descendant after a short delay:
+`BaseDialog` now exposes an explicit initial-focus API that is forwarded into `useShowModal`:
 
 ```ts
-setTimeout(() => {
-  const target = dialog.querySelector<HTMLElement>("[autofocus]");
-  if (target) target.focus();
-}, 50);
+type InitialFocusStrategy =
+  | "dialog"
+  | "first-control"
+  | "safe-action";
+
+interface BaseDialogProps extends ComponentPropsWithoutRef<"dialog"> {
+  initialFocus?: InitialFocusStrategy;
+  initialFocusRef?: RefObject<HTMLElement | null>;
+}
 ```
 
-Each dialog places `autofocus` on the element that should receive focus: the primary action button, or the close button where no single action is primary. Using `autofocus` rather than a hand-rolled focusable-element selector means each dialog controls its own initial focus position explicitly, and `useShowModal` stays decoupled from element-type heuristics.
+After the dialog receives initial container focus, `useShowModal` applies the requested strategy after a short delay:
+
+- `dialog` keeps focus on the dialog itself, which is best for larger or more complex dialogs where users need to orient first.
+- `first-control` moves focus to the first interactive descendant.
+- `safe-action` focuses the element marked with `data-dialog-safe-action`, falling back to the dialog if none exists.
+- `initialFocusRef` overrides all strategy heuristics and focuses an explicit element instead. If that element is not normally focusable, `useShowModal` temporarily adds `tabindex="-1"` so it can receive programmatic focus.
+
+`safe-action` is for choice dialogs where one option is clearly lower-risk than the others. In plain language: focus the option that leaves the user safest if they activate it accidentally. For example, the unsaved-changes confirm focuses `Edit` rather than `Discard`.
+
+Current usage:
+
+- `SettingsModal` uses `initialFocusRef` to focus its `Options` heading explicitly, which is more reliable than leaving focus on the dialog container in VoiceOver.
+- `DiscardConfirmOverlay` uses `initialFocus="safe-action"` and marks `Edit` as the safe action.
+- `DisclaimerModal` uses `initialFocus="first-control"` because it is short, informational, and has a single acknowledgment action.
+- Generic `Modal` falls back to the shared default of `dialog`.
 
 `setTimeout` (not `requestAnimationFrame`) is required because VoiceOver needs actual processing time — not just one paint frame — to absorb the top-layer promotion before it will follow a focus change. Without the delay, VoiceOver does not announce the newly focused element inside the dialog.
 
-This follows the ARIA APG dialog pattern, which requires focus to land on an element inside the dialog on open.
+This follows the ARIA APG dialog pattern while avoiding a blanket "first tabbable element" rule. The dialog always receives focus first for announcement and context, then each modal chooses a focus target based on its semantics rather than raw DOM order.
+
+This is intentionally different from route-change focus. Full page navigations prefer the first `<h1>` because the page heading is the best orientation cue for a new document. Dialogs that use `initialFocusRef` can point at their `<h1>` for the same effect, or at a different element when that better suits the dialog's layout.
 
 **On close — keyboard-opened dialogs:** focus is restored to whichever element was active when the dialog opened (typically the button that triggered it). This is the standard accessible modal pattern — without it, keyboard focus would land on `<body>` or be lost entirely, forcing the user to Tab back through the page from the top to find their place. The restoration runs inside a `requestAnimationFrame` to let React finish unmounting, with a fallback to `<main>` if the opener has since been removed from the DOM. A secondary effect: retaining a dead reference to a removed dialog element as the active element causes subsequent Escape presses to miss the `EscapeNavigation` handler, so the blur-before-close step in the cleanup also guards against that.
 
@@ -157,7 +178,7 @@ This design keeps Escape behaviour composable across nested dialogs without each
 On every pathname change, `Layout` resets the scroll position of `<main>` and moves focus into the new page:
 
 ```ts
-mainRef.current.scrollTop = 0;
+mainRef.current.scrollTo({ top: 0 });
 const h1 = mainRef.current.querySelector("h1");
 if (h1) {
   if (!h1.hasAttribute("tabindex")) h1.setAttribute("tabindex", "-1");

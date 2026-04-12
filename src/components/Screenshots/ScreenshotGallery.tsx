@@ -36,6 +36,8 @@ const ScreenshotGallery = () => {
   const touchEndXRef = useRef<number | null>(null);
   const galleryRef = useRef<HTMLDivElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
+  const viewerHeadingRef = useRef<HTMLSpanElement>(null);
+  const shouldFocusViewerRef = useRef(false);
   // Set when navigating back so the useEffect can focus the first menu button.
   const shouldFocusMenuRef = useRef(false);
 
@@ -250,9 +252,27 @@ const ScreenshotGallery = () => {
   useEffect(() => {
     if (currentScreen !== null || !shouldFocusMenuRef.current) return;
     shouldFocusMenuRef.current = false;
-    requestAnimationFrame(() => {
+
+    const focusTimer = window.setTimeout(() => {
       menuRef.current?.querySelector<HTMLElement>("button")?.focus();
-    });
+    }, 50);
+
+    return () => window.clearTimeout(focusTimer);
+  }, [currentScreen]);
+
+  // When entering the viewer from the menu, focus a short status heading so
+  // screen reader users hear the current set and item count before the nav
+  // controls. Do not do this during next/previous navigation, which should
+  // leave focus on the activated control.
+  useEffect(() => {
+    if (currentScreen === null || !shouldFocusViewerRef.current) return;
+    shouldFocusViewerRef.current = false;
+
+    const focusTimer = window.setTimeout(() => {
+      viewerHeadingRef.current?.focus();
+    }, 50);
+
+    return () => window.clearTimeout(focusTimer);
   }, [currentScreen]);
 
   const currentScreenId = currentScreen?.id;
@@ -333,7 +353,10 @@ const ScreenshotGallery = () => {
         {screenshotsData.screenshots.map((item, index) => (
           <button
             key={item.id}
-            onClick={() => handleSelectScreen(item, index)}
+            onClick={() => {
+              shouldFocusViewerRef.current = true;
+              handleSelectScreen(item, index);
+            }}
             aria-label={`View ${item.name} screenshots`}
             className="block w-full cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-1"
           >
@@ -352,6 +375,9 @@ const ScreenshotGallery = () => {
   // Screenshot viewer
   return (
     <div ref={galleryRef}>
+      <span ref={viewerHeadingRef} tabIndex={-1} className="sr-only">
+        {currentScreen.name} screenshots
+      </span>
       <button
         onClick={handleBackToMenu}
         aria-label={`Back to screenshot menu (currently viewing ${currentScreen.name})`}

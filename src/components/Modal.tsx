@@ -18,6 +18,8 @@ export function Modal({
   height = 400,
   isPopUp,
   onClose,
+  labelledBy,
+  initialFocusRef,
 }: ModalProps) {
   const { isModalEnabled, openPopup } = useModal(isPopUp);
   const [isOpen, setIsOpen] = useState(true);
@@ -112,12 +114,12 @@ export function Modal({
     <BaseDialog
       closeOnBackdrop
       onClose={handleClose}
+      aria-labelledby={labelledBy}
+      initialFocusRef={initialFocusRef}
       className="bg-page"
       data-overlay="true"
     >
       <div className="w3-app-max-width mx-auto relative flex h-full w-full items-center justify-center px-6 py-4 pointer-events-none">
-        <ModalCloseButton onClick={handleClose} />
-
         <div
           className="relative w-full pointer-events-auto"
           style={{
@@ -128,6 +130,8 @@ export function Modal({
         >
           <div className="h-full w-full">{children}</div>
         </div>
+
+        <ModalCloseButton onClick={handleClose} />
       </div>
     </BaseDialog>
   );

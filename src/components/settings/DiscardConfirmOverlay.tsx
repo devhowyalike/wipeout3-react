@@ -22,6 +22,7 @@ export function DiscardConfirmOverlay({
     <BaseDialog
       portal={false}
       role="alertdialog"
+      initialFocus="safe-action"
       aria-labelledby={HEADING_ID}
       className="bg-page flex flex-col items-center justify-center gap-6"
     >
@@ -37,7 +38,11 @@ export function DiscardConfirmOverlay({
         <AngledButton variant="secondary" onClick={onDiscard}>
           Discard
         </AngledButton>
-        <AngledButton variant="primary" onClick={onEdit}>
+        <AngledButton
+          variant="primary"
+          onClick={onEdit}
+          data-dialog-safe-action
+        >
           Edit
         </AngledButton>
       </div>
