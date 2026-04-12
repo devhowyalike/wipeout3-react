@@ -39,7 +39,7 @@ export function BaseDialog({
   };
 
   const dialog = (
-    <dialog ref={dialogRef} onClick={handleClick} {...rest}>
+    <dialog ref={dialogRef} aria-modal="true" onClick={handleClick} {...rest}>
       {children}
     </dialog>
   );
