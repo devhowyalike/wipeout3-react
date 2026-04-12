@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { safeLocalStorage } from "@/components/settings/safeLocalStorage";
 import { BaseDialog } from "./ui/BaseDialog";
 
@@ -20,6 +20,21 @@ export function DisclaimerModal() {
     safeLocalStorage("set", STORAGE_KEY, "true");
     setVisible(false);
   };
+
+  return <DisclaimerDialog onClose={handleClose} />;
+}
+
+function DisclaimerDialog({ onClose }: { onClose: () => void }) {
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        e.preventDefault();
+        onClose();
+      }
+    };
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [onClose]);
 
   return (
     <BaseDialog
@@ -53,7 +68,7 @@ export function DisclaimerModal() {
         </p>
 
         <button
-          onClick={handleClose}
+          onClick={onClose}
           className="font-wipeout3 text-lg uppercase px-8 py-2 bg-accent-primary text-page hover:bg-accent-primary-hover transition-colors cursor-pointer"
         >
           I Understand<span className="animate-w3-blink">_</span>
