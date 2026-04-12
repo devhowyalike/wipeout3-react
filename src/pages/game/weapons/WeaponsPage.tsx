@@ -41,6 +41,13 @@ export default function WeaponsPage() {
         </div>
       </BorderedTable>
 
+      {/* Always-present live region so VoiceOver announces weapon details on selection */}
+      <div aria-live="polite" aria-atomic="true" className="sr-only">
+        {hoveredWeapon
+          ? `${hoveredWeapon.name}. ${hoveredWeapon.category.join(", ")}. ${hoveredWeapon.desc}`
+          : ""}
+      </div>
+
       <WeaponDetails weapon={hoveredWeapon} />
     </Page>
   );
