@@ -149,6 +149,14 @@
     outline: none;
   }
 
+  /* tabindex="-1" elements are only ever focused programmatically (e.g. h1 on
+     route change, sr-only landmarks). Never show an outline on them, even when
+     the browser's focus-visible heuristic fires because the trigger was a key. */
+  [tabindex="-1"]:focus,
+  [tabindex="-1"]:focus-visible {
+    outline: none;
+  }
+
   :focus-visible {
     outline: 2px solid currentColor;
     outline-offset: 3px;
