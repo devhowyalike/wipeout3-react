@@ -19,7 +19,15 @@ export default function SubscribePage() {
       footerTitle="Subscribe"
       footerSubtitle="Pitlane Select"
     >
-      {!showSuccess ? (
+      <div role="status" aria-live="polite">
+        {showSuccess && (
+          <Headline level={1} variant="xl" className="mb-6">
+            <span className="text-white">Thankyou.</span>{" "}
+            <span className="block">Welcome.</span>
+          </Headline>
+        )}
+      </div>
+      {!showSuccess && (
         <>
           <Headline level={1} variant="xl" className="mb-6 subpixel-fix">
             Enter your <span className="block">e-mail address</span>
@@ -39,11 +47,6 @@ export default function SubscribePage() {
             </button>
           </form>
         </>
-      ) : (
-        <Headline level={1} variant="xl" className="mb-6">
-          <span className="text-white">Thankyou.</span>{" "}
-          <span className="block">Welcome.</span>
-        </Headline>
       )}
     </Page>
   );
