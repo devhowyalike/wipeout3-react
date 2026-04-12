@@ -1,5 +1,4 @@
 import { useEffect, type RefObject } from "react";
-import { getLastInputModality } from "@/utils/inputModality";
 
 export type InitialFocusStrategy =
   | "dialog"
@@ -53,11 +52,9 @@ function getInitialFocusTarget(
  * `cancel` doesn't bubble and React's delegation never intercepts it. Escape
  * handling is left to the centralised `EscapeNavigation` keydown listener.
  *
- * On teardown, keyboard-opened dialogs restore focus to the opener when
- * possible. This avoids an intermittent state where the browser keeps focus on
- * a removed dialog control, causing later Escape presses to miss the
- * page-level navigation handler, without re-focusing pointer-triggered links
- * and buttons.
+ * On teardown, restores focus to the element that was active before the dialog
+ * opened. This follows the ARIA dialog pattern and ensures screen readers
+ * (including VoiceOver) regain their previous context after dismissal.
  */
 export function useShowModal(
   ref: RefObject<HTMLDialogElement | null>,
@@ -71,11 +68,7 @@ export function useShowModal(
         ? document.activeElement
         : null;
 
-    const openedViaKeyboard = getLastInputModality() === "keyboard";
-
     // Blur the trigger so its focus ring doesn't bleed through the backdrop.
-    // Done for all modalities because VoiceOver's navigation keys (VO+Arrow)
-    // carry ctrlKey and are misclassified as "pointer" by the modality tracker.
     previousActiveElement?.blur();
 
     dialog.showModal();
@@ -114,9 +107,9 @@ export function useShowModal(
       }
       if (dialog.open) dialog.close();
 
-      if (openedViaKeyboard) {
+      if (previousActiveElement) {
         requestAnimationFrame(() => {
-          if (previousActiveElement?.isConnected) {
+          if (previousActiveElement.isConnected) {
             previousActiveElement.focus({ preventScroll: true });
             return;
           }

@@ -95,7 +95,7 @@ The CSS `:focus-visible` pseudo-class encodes exactly this intent. Every interac
 previousActiveElement?.blur();
 ```
 
-This is done regardless of input modality because VoiceOver's navigation keys (VO+Arrow) carry `ctrlKey` and are misclassified as pointer by the modality tracker, so a modality check here would leave focus on the trigger for those users.
+This prevents the trigger's focus ring from bleeding through the backdrop overlay.
 
 After `.showModal()`, focus is first parked on the dialog container so VoiceOver registers the new top-layer context:
 
@@ -140,9 +140,7 @@ This follows the ARIA APG dialog pattern while avoiding a blanket "first tabbabl
 
 This is intentionally different from route-change focus. Full page navigations prefer the first `<h1>` because the page heading is the best orientation cue for a new document. Dialogs that use `initialFocusRef` can point at their `<h1>` for the same effect, or at a different element when that better suits the dialog's layout.
 
-**On close — keyboard-opened dialogs:** focus is restored to whichever element was active when the dialog opened (typically the button that triggered it). This is the standard accessible modal pattern — without it, keyboard focus would land on `<body>` or be lost entirely, forcing the user to Tab back through the page from the top to find their place. The restoration runs inside a `requestAnimationFrame` to let React finish unmounting, with a fallback to `<main>` if the opener has since been removed from the DOM. A secondary effect: retaining a dead reference to a removed dialog element as the active element causes subsequent Escape presses to miss the `EscapeNavigation` handler, so the blur-before-close step in the cleanup also guards against that.
-
-**On close — pointer-opened dialogs:** focus is deliberately _not_ restored to the opener. A pointer user knows where they are from their cursor position; programmatically re-focusing the button they clicked would surface a focus ring on it with no keyboard interaction to justify it.
+**On close:** focus is restored to whichever element was active when the dialog opened (typically the button that triggered it). This follows the ARIA dialog pattern and ensures screen readers (including VoiceOver) regain their previous context after dismissal. Without restoration, keyboard and screen reader users would land on `<body>` or lose focus entirely, forcing them to Tab back through the page from the top. The restoration runs inside a `requestAnimationFrame` to let React finish unmounting, with a fallback to `<main>` if the opener has since been removed from the DOM. A secondary effect: retaining a dead reference to a removed dialog element as the active element causes subsequent Escape presses to miss the `EscapeNavigation` handler, so the blur-before-close step in the cleanup also guards against that. Pointer users see no visible focus ring thanks to `:focus-visible` — programmatic focus after a pointer interaction does not match `:focus-visible` in any browser this project targets.
 
 #### SettingsModal key-remount on reopen
 
@@ -157,15 +155,7 @@ const handleOpenSettings = () => {
 {isSettingsOpen && <SettingsModal key={settingsModalKey} ... />}
 ```
 
-Because `SettingsModal` is conditionally rendered, each unmount/remount cycle already triggers a fresh `useShowModal` effect. The key increment is belt-and-suspenders: it guarantees a genuinely new component instance even if React's reconciler would otherwise reuse the existing tree (e.g. in future refactors), ensuring that `useShowModal` captures the correct opener element and input modality on every open.
-
-### Input Modality Tracking
-
-`src/utils/inputModality.ts` records whether the user's most recent interaction was via keyboard or pointer. Two global capture-phase listeners — `pointerdown` and `keydown` (ignoring modifier-only presses such as Ctrl/Cmd/Alt) — update a module-level variable.
-
-The listeners are initialised **immediately on first import**, outside any React lifecycle. This is intentional: the interaction that opens a modal (a keyboard Enter on a focused button, or a mouse click) happens _before_ the modal component mounts and `useShowModal` runs its effect. Deferring setup to a `useEffect` would miss that event, causing every dialog to appear as pointer-opened regardless of how it was triggered.
-
-`useShowModal` calls `getLastInputModality()` synchronously at the top of its effect — before `.showModal()` shifts focus — so the captured value correctly reflects whether the dialog was opened by keyboard or pointer. This is used on teardown to decide whether to restore focus to the opener.
+Because `SettingsModal` is conditionally rendered, each unmount/remount cycle already triggers a fresh `useShowModal` effect. The key increment is belt-and-suspenders: it guarantees a genuinely new component instance even if React's reconciler would otherwise reuse the existing tree (e.g. in future refactors), ensuring that `useShowModal` captures the correct opener element on every open.
 
 ### EscapeNavigation and Stacked Escape Handling
 
