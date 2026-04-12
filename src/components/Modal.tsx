@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { useModal } from "@/hooks/useModal";
 import { ModalProps } from "@/types/Modal.types";
 import { useEscapeKey } from "./useEscapeKey";
@@ -29,7 +29,6 @@ export function Modal({
   const [isOpen, setIsOpen] = useState(true);
   const popupWindowRef = useRef<Window | null>(null);
   const popupCloseTimeoutRef = useRef<number | null>(null);
-  const previousActiveElementRef = useRef<HTMLElement | null>(null);
   // When a label is provided and the caller hasn't specified an explicit focus
   // target, automatically focus a sr-only span so VoiceOver announces the
   // dialog name as the landing announcement instead of the first control.
@@ -43,9 +42,6 @@ export function Modal({
   const aspectRatio = finalPopUpWidth / finalPopUpHeight;
 
   useEffect(() => {
-    // Store the previously focused element when modal opens
-    previousActiveElementRef.current = document.activeElement as HTMLElement;
-
     if (popupCloseTimeoutRef.current !== null) {
       window.clearTimeout(popupCloseTimeoutRef.current);
       popupCloseTimeoutRef.current = null;
@@ -94,16 +90,10 @@ export function Modal({
     onClose,
   ]);
 
-  const handleClose = () => {
+  const handleClose = useCallback(() => {
     setIsOpen(false);
-    // Blur the previously focused element to remove active state
-    if (previousActiveElementRef.current) {
-      previousActiveElementRef.current.blur();
-    }
-    if (onClose) {
-      onClose();
-    }
-  };
+    onClose?.();
+  }, [onClose]);
 
   // Register ESC key handler with centralized escape navigation
   useEscapeKey(handleClose);

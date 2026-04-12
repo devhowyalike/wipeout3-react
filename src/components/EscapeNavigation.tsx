@@ -41,6 +41,7 @@ export function EscapeNavigation({ children }: { children: ReactNode }) {
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
         if (handlersRef.current.length > 0) {
+          e.preventDefault();
           const lastHandler =
             handlersRef.current[handlersRef.current.length - 1];
           lastHandler();
