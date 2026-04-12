@@ -7,6 +7,7 @@ interface VideoPlayerProps {
   height: number;
   autoPlay?: boolean;
   nativeControls?: boolean;
+  ariaLabel?: string;
 }
 
 /**
@@ -19,6 +20,7 @@ export default function VideoPlayer({
   height,
   autoPlay = false,
   nativeControls = false,
+  ariaLabel,
 }: VideoPlayerProps) {
   const [isPlaying, setIsPlaying] = useState(autoPlay);
   const [isHovering, setIsHovering] = useState(false);
@@ -60,6 +62,7 @@ export default function VideoPlayer({
         autoPlay={autoPlay}
         controls
         playsInline
+        aria-label={ariaLabel}
       >
         <source src={src} type="video/mp4" />
       </video>
@@ -79,6 +82,7 @@ export default function VideoPlayer({
         autoPlay={autoPlay}
         playsInline
         className="cursor-pointer"
+        aria-label={ariaLabel}
         onClick={(e) => {
           e.preventDefault();
           togglePlay();

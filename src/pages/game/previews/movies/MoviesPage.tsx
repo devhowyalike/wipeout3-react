@@ -20,13 +20,14 @@ export default function MoviesPage() {
       animation: getMovieAnimation(movie.id),
       modalConfig: {
         content: (
-          <Modal width={movie.width} height={movie.height} label={movie.name}>
+          <Modal width={movie.width} height={movie.height} label={`${movie.name} movie clip`}>
             <VideoPlayer
               src={movie.src}
               width={movie.width}
               height={movie.height}
               autoPlay
               nativeControls={!modalEnabled}
+              ariaLabel={`${movie.name} movie clip`}
             />
           </Modal>
         ),
