@@ -41,7 +41,7 @@ export default function BannersPage() {
           height={modalHeight}
           // Don't exceed largest video width or the banner modal cap
           modalWidth={`min(80vw, ${getVideoWidth("lg")}px, var(--w3-banner-max-width))`}
-          label={banner.name}
+          label={`${banner.name} team banner animation`}
           onClose={() => {
             bannerRefs.current[banner.id]?.cleanup();
           }}
