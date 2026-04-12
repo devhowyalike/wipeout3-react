@@ -37,7 +37,7 @@ export default function ContactForm({ onClose }: { onClose?: () => void }) {
   };
 
   return (
-    <Modal modalWidth={480} width={480} height={400} onClose={onClose}>
+    <Modal modalWidth={480} width={480} height={400} onClose={onClose} label="Contact" initialFocus="first-control">
       <div className="p-6">
         {status === "success" ? (
           <Headline level={1} variant="xl" className="mb-6">

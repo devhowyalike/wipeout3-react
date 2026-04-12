@@ -20,6 +20,7 @@ export function Modal({
   onClose,
   label,
   labelledBy,
+  initialFocus,
   initialFocusRef,
 }: ModalProps) {
   const { isModalEnabled, openPopup } = useModal(isPopUp);
@@ -27,6 +28,11 @@ export function Modal({
   const popupWindowRef = useRef<Window | null>(null);
   const popupCloseTimeoutRef = useRef<number | null>(null);
   const previousActiveElementRef = useRef<HTMLElement | null>(null);
+  // When a label is provided and the caller hasn't specified an explicit focus
+  // target, automatically focus a sr-only span so VoiceOver announces the
+  // dialog name as the landing announcement instead of the first control.
+  const labelFocusRef = useRef<HTMLSpanElement>(null);
+  const effectiveInitialFocusRef = initialFocusRef ?? (label ? labelFocusRef : undefined);
 
   // Handle legacy props and defaults
   const finalPopUpWidth = popUpWidth || width;
@@ -117,11 +123,17 @@ export function Modal({
       onClose={handleClose}
       aria-label={label}
       aria-labelledby={labelledBy}
-      initialFocusRef={initialFocusRef}
+      initialFocus={initialFocus}
+      initialFocusRef={effectiveInitialFocusRef}
       className="bg-page"
       data-overlay="true"
     >
       <div className="w3-app-max-width mx-auto relative flex h-full w-full items-center justify-center px-6 py-4 pointer-events-none">
+        {label && !initialFocusRef && (
+          <span ref={labelFocusRef} tabIndex={-1} className="sr-only">
+            {label}
+          </span>
+        )}
         <div
           className="relative w-full pointer-events-auto"
           style={{

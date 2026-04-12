@@ -1,4 +1,5 @@
 import type { ReactNode, RefObject } from "react";
+import type { InitialFocusStrategy } from "@/hooks/useShowModal";
 
 /** Props for the `Modal` component that renders content as an overlay or popup window. */
 export interface ModalProps {
@@ -22,6 +23,8 @@ export interface ModalProps {
   labelledBy?: string;
   // Optional direct accessible name for the underlying dialog
   label?: string;
+  // Optional initial-focus strategy forwarded to BaseDialog
+  initialFocus?: InitialFocusStrategy;
   // Optional initial-focus target forwarded to BaseDialog
   initialFocusRef?: RefObject<HTMLElement | null>;
 }
