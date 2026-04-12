@@ -157,7 +157,7 @@ export default function UnderConstructionStatus({
         </div>
       </article>
       <div className="mt-5 flex justify-start">
-        <AngryManIcon size="md" blink className="text-white" aria-label="Angryman" />
+        <AngryManIcon size="md" blink className="text-white" />
       </div>
     </div>
   );
