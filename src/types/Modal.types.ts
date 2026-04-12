@@ -20,6 +20,8 @@ export interface ModalProps {
   onClose?: () => void;
   // Optional accessible-name source for the underlying dialog
   labelledBy?: string;
+  // Optional direct accessible name for the underlying dialog
+  label?: string;
   // Optional initial-focus target forwarded to BaseDialog
   initialFocusRef?: RefObject<HTMLElement | null>;
 }

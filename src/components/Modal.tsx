@@ -18,6 +18,7 @@ export function Modal({
   height = 400,
   isPopUp,
   onClose,
+  label,
   labelledBy,
   initialFocusRef,
 }: ModalProps) {
@@ -114,6 +115,7 @@ export function Modal({
     <BaseDialog
       closeOnBackdrop
       onClose={handleClose}
+      aria-label={label}
       aria-labelledby={labelledBy}
       initialFocusRef={initialFocusRef}
       className="bg-page"

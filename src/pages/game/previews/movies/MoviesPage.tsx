@@ -20,7 +20,7 @@ export default function MoviesPage() {
       animation: getMovieAnimation(movie.id),
       modalConfig: {
         content: (
-          <Modal width={movie.width} height={movie.height}>
+          <Modal width={movie.width} height={movie.height} label={movie.name}>
             <VideoPlayer
               src={movie.src}
               width={movie.width}
