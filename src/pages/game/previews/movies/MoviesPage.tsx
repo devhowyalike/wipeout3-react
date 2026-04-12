@@ -42,6 +42,7 @@ export default function MoviesPage() {
       footerTitle="Movie Clips"
       footerSubtitle="Previews Select"
     >
+      <h1 className="sr-only">Movie Clips — Select a clip</h1>
       <Menu items={menuItems} />
     </Page>
   );

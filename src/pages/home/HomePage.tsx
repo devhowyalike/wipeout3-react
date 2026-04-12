@@ -24,6 +24,7 @@ export default function HomePage() {
       documentTitle="Menu Select"
       footerTitle={DEFAULT_FOOTER_MENU_SUBTITLE}
     >
+      <h1 className="sr-only">Wipeout 3 — Main Menu</h1>
       <Menu items={menuItems} />
     </Page>
   );

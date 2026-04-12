@@ -65,6 +65,7 @@ export default function BannersPage() {
       footerTitle="Banners"
       footerSubtitle="Pitlane Select"
     >
+      <h1 className="sr-only">Banners — Select a team</h1>
       <Menu items={menuItems} />
       {bannersFlash && (
         <Suspense fallback={null}>

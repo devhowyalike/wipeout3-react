@@ -14,6 +14,7 @@ export default function HistoryPage() {
       documentTitle="History"
       footerTitle="History Select"
     >
+      <h1 className="sr-only">History — Select a section</h1>
       <Menu items={menuItems} />
     </Page>
   );

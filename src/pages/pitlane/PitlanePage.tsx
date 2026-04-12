@@ -19,6 +19,7 @@ export default function PitlanePage() {
 
   return (
     <Page theme="sandTheme" documentTitle="Pitlane" footerTitle="Pitlane">
+      <h1 className="sr-only">Pit Lane — Select a section</h1>
       <Menu items={menuItems} />
     </Page>
   );
