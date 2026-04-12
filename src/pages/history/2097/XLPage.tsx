@@ -22,6 +22,11 @@ export default function XLPage() {
         heading gives VoiceOver something to announce on route-change focus.
       */}
       <h1 className="sr-only">Wipeout 2097 / XL history</h1>
+      <p className="sr-only">
+        This page is a decorative display showing a rotating slideshow of
+        imagery from the Wipeout 2097/XL website. There is no additional text
+        content.
+      </p>
       <VerticalBillboard images={imageUrls} interval={5000} />
     </Page>
   );
