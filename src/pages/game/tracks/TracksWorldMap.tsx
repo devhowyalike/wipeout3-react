@@ -32,7 +32,7 @@ const TracksWorldMap = () => {
       .querySelectorAll<SVGGElement>(".track-group")
       .forEach((group) => {
         group.setAttribute("tabindex", "0");
-        group.setAttribute("role", "button");
+        group.setAttribute("role", "img");
         group.setAttribute("aria-label", `${idToLabel(group.id)} track`);
       });
   }, [svgContent]);
