@@ -19,7 +19,7 @@ const Page404 = () => {
     >
       <div className="flex justify-center items-center  min-h-full">
         <div className="flex items-center flex-col justify-center max-w-lg w-full text-center">
-          <AngryManIcon size="md" blink />
+          <AngryManIcon size="md" blink aria-label="Angryman" />
           <Headline level={1} variant="xxl" className="mb-8">
             404
           </Headline>

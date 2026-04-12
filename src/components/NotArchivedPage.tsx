@@ -14,7 +14,7 @@ export default function NotArchivedPage({ pageTitle }: { pageTitle: string }) {
       <Headline level={2} variant="lg" className="mb-7">
         This section was not archived.
       </Headline>
-      <AngryManIcon size="md" blink />
+      <AngryManIcon size="md" blink aria-label="Angryman" />
     </>
   );
 }
