@@ -69,6 +69,8 @@ All modals (`DisclaimerModal`, `SettingsModal`, `Modal`, `DiscardConfirmOverlay`
 | **Scroll blocking**  | Background content does not scroll while the dialog is open                         |
 | **Top layer**        | The dialog renders above all other content without `z-index` management             |
 
+`BaseDialog` also sets `aria-modal="true"` on every `<dialog>` element. Native `.showModal()` already implies modal semantics in current browsers, but `aria-modal` makes the role explicit for screen readers that do not yet fully honour the native attribute, and it future-proofs against any assistive technology that inspects ARIA attributes before querying browser-native state.
+
 Nested dialogs (e.g. `SettingsModal` → `DiscardConfirmOverlay`) are handled natively: the inner `.showModal()` promotes the confirm overlay to the top layer and automatically makes the parent dialog inert. When the inner dialog closes, focus returns to the parent.
 
 The shared `useShowModal` hook (`src/hooks/useShowModal.ts`) calls `.showModal()` on mount and `.close()` on cleanup.
@@ -103,6 +105,28 @@ After `.showModal()`, focus is first parked on the dialog container so VoiceOver
 dialog.setAttribute("tabindex", "-1");
 dialog.focus();
 ```
+
+#### Accessible name and VoiceOver announcement
+
+`Modal` always computes an accessible name, even when neither `label` nor `labelledBy` is supplied:
+
+```ts
+const dialogName = label ?? (labelledBy ? undefined : "Dialog");
+```
+
+If `labelledBy` is set, the element it points to provides the name; otherwise `dialogName` is either the explicit `label` string or the fallback `"Dialog"`. This ensures every `Modal` instance has a non-empty accessible name in the accessibility tree.
+
+VoiceOver reads the dialog's accessible name as part of the context announcement, but only if focus lands on the dialog container or an element that can relay that name. To make the name audible as the very first thing VoiceOver announces — regardless of where the `initialFocus` strategy ultimately moves focus — `Modal` renders a visually hidden `<span>` containing `dialogName` and uses it as the `initialFocusRef` target when no other ref is specified:
+
+```tsx
+{dialogName && !initialFocusRef && (
+  <span ref={labelFocusRef} tabIndex={-1} className="sr-only">
+    {dialogName}
+  </span>
+)}
+```
+
+VoiceOver reads the span's text content on focus, giving users an immediate spoken announcement of the dialog's purpose before any interactive content is reached. The span is only rendered — and only used as the focus target — when no explicit `initialFocusRef` has been provided; callers that supply their own ref (e.g. `SettingsModal` pointing at its heading) get their own announcement through that element instead.
 
 `BaseDialog` now exposes an explicit initial-focus API that is forwarded into `useShowModal`:
 
@@ -139,6 +163,8 @@ Current usage:
 This follows the ARIA APG dialog pattern while avoiding a blanket "first tabbable element" rule. The dialog always receives focus first for announcement and context, then each modal chooses a focus target based on its semantics rather than raw DOM order.
 
 This is intentionally different from route-change focus. Full page navigations prefer the first `<h1>` because the page heading is the best orientation cue for a new document. Dialogs that use `initialFocusRef` can point at their `<h1>` for the same effect, or at a different element when that better suits the dialog's layout.
+
+**See also:** [Where to Put Focus When Opening a Modal Dialog — Adrian Roselli](https://adrianroselli.com/2025/06/where-to-put-focus-when-opening-a-modal-dialog.html) for the accessibility rationale behind context-sensitive focus strategies.
 
 **On close:** focus is restored to whichever element was active when the dialog opened (typically the button that triggered it). This follows the ARIA dialog pattern and ensures screen readers (including VoiceOver) regain their previous context after dismissal. Without restoration, keyboard and screen reader users would land on `<body>` or lose focus entirely, forcing them to Tab back through the page from the top. The restoration runs inside a `requestAnimationFrame` to let React finish unmounting, with a fallback to `<main>` if the opener has since been removed from the DOM. A secondary effect: retaining a dead reference to a removed dialog element as the active element causes subsequent Escape presses to miss the `EscapeNavigation` handler, so the blur-before-close step in the cleanup also guards against that. Pointer users see no visible focus ring thanks to `:focus-visible` — programmatic focus after a pointer interaction does not match `:focus-visible` in any browser this project targets.
 
