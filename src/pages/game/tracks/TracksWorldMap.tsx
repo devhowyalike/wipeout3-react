@@ -23,18 +23,22 @@ const TracksWorldMap = () => {
       .then(setSvgContent);
   }, []);
 
-  // Make each track group keyboard- and VoiceOver-accessible after injection.
   useEffect(() => {
     const container = containerRef.current;
     if (!container || !svgContent) return;
 
-    container
-      .querySelectorAll<SVGGElement>(".track-group")
-      .forEach((group) => {
-        group.setAttribute("tabindex", "0");
-        group.setAttribute("role", "img");
-        group.setAttribute("aria-label", `${idToLabel(group.id)} track`);
-      });
+    const svg = container.querySelector("svg");
+    if (svg) {
+      svg.setAttribute("role", "img");
+      svg.setAttribute(
+        "aria-label",
+        `World map showing track locations: ${Array.from(
+          container.querySelectorAll<SVGGElement>(".track-group"),
+        )
+          .map((g) => idToLabel(g.id))
+          .join(", ")}`,
+      );
+    }
   }, [svgContent]);
 
   useEffect(() => {
@@ -47,31 +51,12 @@ const TracksWorldMap = () => {
     const handleClick = (e: Event) => {
       if ((e.target as Element).closest(".track-group")) playClickSound();
     };
-    const handleFocusIn = (e: Event) => {
-      const group = (e.target as Element).closest(".track-group");
-      // Only fire for focus arriving directly on the group (tabindex="0"),
-      // not bubbling up from a child element.
-      if (group === e.target) playHoverSound();
-    };
-    const handleKeyDown = (e: Event) => {
-      const ke = e as KeyboardEvent;
-      if (ke.key !== "Enter" && ke.key !== " ") return;
-      if ((ke.target as Element).closest(".track-group")) {
-        ke.preventDefault();
-        playClickSound();
-      }
-    };
-
     container.addEventListener("mouseenter", handleMouseEnter, true);
     container.addEventListener("click", handleClick, true);
-    container.addEventListener("focusin", handleFocusIn);
-    container.addEventListener("keydown", handleKeyDown);
 
     return () => {
       container.removeEventListener("mouseenter", handleMouseEnter, true);
       container.removeEventListener("click", handleClick, true);
-      container.removeEventListener("focusin", handleFocusIn);
-      container.removeEventListener("keydown", handleKeyDown);
     };
   }, [svgContent, playHoverSound, playClickSound]);
 
