@@ -1,6 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { safeLocalStorage } from "@/components/settings/safeLocalStorage";
 import { BaseDialog } from "./ui/BaseDialog";
+import { useEscapeKey } from "./useEscapeKey";
 
 const STORAGE_KEY = "wipeout3-disclaimer-seen";
 const HEADING_ID = "disclaimer-modal-heading";
@@ -25,16 +26,7 @@ export function DisclaimerModal() {
 }
 
 function DisclaimerDialog({ onClose }: { onClose: () => void }) {
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        e.preventDefault();
-        onClose();
-      }
-    };
-    document.addEventListener("keydown", handleKeyDown);
-    return () => document.removeEventListener("keydown", handleKeyDown);
-  }, [onClose]);
+  useEscapeKey(onClose);
 
   return (
     <BaseDialog

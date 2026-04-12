@@ -7,6 +7,7 @@ import { useOptions } from "@/hooks/useOptions";
 import AppContainer from "./AppContainer";
 import Footer from "./Footer/Footer";
 import { EscapeNavigation } from "./EscapeNavigation";
+import { DisclaimerModal } from "./DisclaimerModal";
 import { useLayoutEffect, useRef } from "react";
 import { useNavigationEventGuard } from "@/hooks/useNavigationEventGuard";
 import { useRouteChangeFocus } from "@/hooks/useRouteChangeFocus";
@@ -19,6 +20,7 @@ export default function Layout() {
     <OptionsProvider>
       <PageProvider>
         <EscapeNavigation>
+          <DisclaimerModal />
           <LayoutContent />
         </EscapeNavigation>
       </PageProvider>
