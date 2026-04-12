@@ -24,6 +24,7 @@ export default function VideoPlayer({
 }: VideoPlayerProps) {
   const [isPlaying, setIsPlaying] = useState(autoPlay);
   const [isHovering, setIsHovering] = useState(false);
+  const [isFocusVisible, setIsFocusVisible] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
@@ -96,13 +97,15 @@ export default function VideoPlayer({
       </video>
       <div
         className={`absolute inset-0 flex items-center justify-center transition-opacity duration-300 ${
-          isPlaying && !isHovering
+          isPlaying && !isHovering && !isFocusVisible
             ? "opacity-0 pointer-events-none"
             : "opacity-100"
         }`}
       >
         <button
           onClick={togglePlay}
+          onFocus={(e) => setIsFocusVisible(e.target.matches(":focus-visible"))}
+          onBlur={() => setIsFocusVisible(false)}
           className="cursor-pointer p-4 bg-black/50 text-white hover:bg-black/70"
           aria-label={isPlaying ? "Pause video" : "Play video"}
         >
