@@ -187,6 +187,8 @@ Because `SettingsModal` is conditionally rendered, each unmount/remount cycle al
 
 `src/components/EscapeNavigation.tsx` wraps the application in a React context that exposes a push/pop handler stack. Components that need to intercept Escape (modals, overlays) register a callback on mount and unregister on unmount. The single `window` keydown listener always invokes the _most recently registered_ handler; when the stack is empty it falls back to `navigate(-1)` (i.e. browser back-navigation), unless the user is already on the home page.
 
+The keydown listener reads `navigate` and `location.pathname` through refs so it is attached exactly once and never torn down/re-attached on route changes. The context value is memoised so consumer `useEscapeKey` effects only fire on mount/unmount, not on every navigation. Both `navigate(-1)` and handler paths call `e.preventDefault()` to suppress the native `cancel` event that would otherwise fire on any open `<dialog>`.
+
 This design keeps Escape behaviour composable across nested dialogs without each layer needing direct knowledge of its siblings. It also means the suppression of the native `cancel` event in `useShowModal` is required — without it, the browser would silently close the dialog before `EscapeNavigation`'s keydown listener fires, breaking the centralised stack.
 
 ### Route-Change Focus Management

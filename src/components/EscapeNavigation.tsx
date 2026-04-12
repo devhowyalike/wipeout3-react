@@ -2,6 +2,7 @@ import {
   useEffect,
   useCallback,
   createContext,
+  useMemo,
   ReactNode,
   useRef,
 } from "react";
@@ -28,6 +29,18 @@ export function EscapeNavigation({ children }: { children: ReactNode }) {
   const navigate = useNavigate();
   const location = useLocation();
   const handlersRef = useRef<EscapeHandler[]>([]);
+  // Refs let the stable keydown listener (attached once, never re-created)
+  // always read the latest values without closing over stale state.
+  const navigateRef = useRef(navigate);
+  const pathnameRef = useRef(location.pathname);
+
+  useEffect(() => {
+    navigateRef.current = navigate;
+  }, [navigate]);
+
+  useEffect(() => {
+    pathnameRef.current = location.pathname;
+  }, [location.pathname]);
 
   const registerHandler = useCallback((handler: EscapeHandler) => {
     handlersRef.current.push(handler);
@@ -37,6 +50,10 @@ export function EscapeNavigation({ children }: { children: ReactNode }) {
     handlersRef.current = handlersRef.current.filter((h) => h !== handler);
   }, []);
 
+  // Empty deps → listener attached once, never torn down/re-attached on route
+  // changes. Reads navigate and pathname through refs so the closure is never
+  // stale. preventDefault on both paths suppresses the native dialog `cancel`
+  // event that the browser would otherwise fire on any open <dialog>.
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
@@ -45,18 +62,26 @@ export function EscapeNavigation({ children }: { children: ReactNode }) {
           const lastHandler =
             handlersRef.current[handlersRef.current.length - 1];
           lastHandler();
-        } else if (location.pathname !== "/") {
-          navigate(-1);
+        } else if (pathnameRef.current !== "/") {
+          e.preventDefault();
+          navigateRef.current(-1);
         }
       }
     };
 
     window.addEventListener("keydown", handleEscape);
     return () => window.removeEventListener("keydown", handleEscape);
-  }, [navigate, location.pathname]);
+  }, []);
+
+  // Memoised so useEscapeKey consumers only run their registration effect on
+  // mount/unmount — not on every navigation that re-renders this provider.
+  const contextValue = useMemo(
+    () => ({ registerHandler, unregisterHandler }),
+    [registerHandler, unregisterHandler],
+  );
 
   return (
-    <EscapeContext.Provider value={{ registerHandler, unregisterHandler }}>
+    <EscapeContext.Provider value={contextValue}>
       {children}
     </EscapeContext.Provider>
   );
