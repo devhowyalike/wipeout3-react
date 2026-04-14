@@ -195,18 +195,11 @@ This design keeps Escape behaviour composable across nested dialogs without each
 
 ### Route-Change Focus Management
 
-On every pathname change, `Layout` resets the scroll position of `<main>` and moves focus into the new page:
+On every pathname change, `useRouteChangeFocus` (called from `Layout`) resets the scroll position of `<main>` and moves focus into the new page. The behaviour differs based on navigation direction, detected via React Router's `useNavigationType()`:
 
-```ts
-mainRef.current.scrollTo({ top: 0 });
-const h1 = mainRef.current.querySelector("h1");
-if (h1) {
-  if (!h1.hasAttribute("tabindex")) h1.setAttribute("tabindex", "-1");
-  h1.focus({ preventScroll: true });
-} else {
-  mainRef.current.focus({ preventScroll: true });
-}
-```
+**Forward navigation (PUSH / REPLACE):** focus lands on the first `<h1>` inside `<main>` so VoiceOver announces the page heading immediately on arrival. Falls back to `<main>` itself when no `<h1>` is present.
+
+**Back / forward navigation (POP):** focus is restored to the element the user originally interacted with — typically the menu link they clicked — so keyboard users return to a predictable position. A `focusin` listener continuously records the last focused element per pathname into a `Map`, storing both the DOM element reference and an ancestor-scoped CSS selector as fallback. On POP navigation, the hook first checks whether the original element is still connected to the DOM (true for persistent shell elements like footer links) and focuses it directly — this avoids selector ambiguity when the same route is linked from multiple places. If the element has been unmounted (route-specific content), it falls back to the CSS selector, which is scoped to the nearest identifiable ancestor (via `id` or `aria-label`) to reduce the chance of matching a duplicate. If no match is found (element removed, selector stale, etc.), focus falls back to the `<h1>` / `<main>` strategy above.
 
 Focus is preferred on the first `<h1>` inside `<main>` rather than `<main>` itself. When VoiceOver focuses a landmark (`<main>`), it announces only the landmark type — the user then has to navigate forward to hear any content. When VoiceOver focuses an `<h1>`, it reads the heading text immediately, giving the user a spoken page title on every navigation.
 

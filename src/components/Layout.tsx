@@ -1,4 +1,4 @@
-import { Outlet, useLocation } from "react-router-dom";
+import { Outlet, useLocation, useNavigationType } from "react-router-dom";
 import { OptionsProvider } from "@/providers/OptionsProvider";
 import { PageProvider } from "@/providers/PageProvider";
 import CRTEffects from "@/providers/CRTEffects";
@@ -34,13 +34,14 @@ function LayoutContent() {
   const { wideCenter } = useOptions();
   const mainRef = useRef<HTMLElement>(null);
   const { pathname } = useLocation();
+  const navigationType = useNavigationType();
 
   useLayoutEffect(() => {
     setLoading(!isThemeApplied);
   }, [isThemeApplied, setLoading]);
 
   useNavigationEventGuard(mainRef, pathname);
-  useRouteChangeFocus(mainRef, pathname);
+  useRouteChangeFocus(mainRef, pathname, navigationType);
 
   return (
     <CRTEffects>
