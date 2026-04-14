@@ -111,5 +111,5 @@ export function useRouteChangeFocus(
     } else {
       container.focus({ preventScroll: true });
     }
-  }, [pathname]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [pathname, navigationType]); // eslint-disable-line react-hooks/exhaustive-deps -- containerRef is a stable ref
 }
