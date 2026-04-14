@@ -110,6 +110,10 @@
   clip-path: polygon(0 0, calc(100% - 3px) 0, 100% 22%, 100% 100%, 0 100%);
 }
 
+@utility angled-corner-btn-lg {
+  clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 22%, 100% 100%, 0 100%);
+}
+
 @utility subpixel-fix {
   opacity: 0.9999;
 }
