@@ -184,6 +184,19 @@ const handleOpenSettings = () => {
 
 Because `SettingsModal` is conditionally rendered, each unmount/remount cycle already triggers a fresh `useShowModal` effect. The key increment is belt-and-suspenders: it guarantees a genuinely new component instance even if React's reconciler would otherwise reuse the existing tree (e.g. in future refactors), ensuring that `useShowModal` captures the correct opener element on every open.
 
+### Menu Modal History Management
+
+When a menu item opens a modal (e.g. Screenshots, Contact, movie clips), the `Menu` component needs to make the browser back button close the modal instead of navigating away from the page. Two strategies are used, chosen automatically based on the current history stack:
+
+| Mode | When chosen | How it works |
+| --- | --- | --- |
+| **`intercept`** | Normal in-app navigation (history index > 0) | No history entry is pushed. A `popstate` listener catches the browser back button, closes the modal, and immediately calls `history.forward()` to cancel the traversal. Because no entry was added, closing the modal leaves no stale forward-stack entry. |
+| **`synthetic`** | First-entry / direct-load visits (history index = 0) | A fake `pushState({ modal: true })` entry is added so the back button has somewhere to land. Closing the modal pops it with `history.back()`. This fallback is necessary because there is no prior same-document entry to intercept on the first visit. |
+
+The strategy is tracked in a `ModalHistoryMode` ref (`"none" | "synthetic" | "intercept"`) inside `Menu`. A helper function `canInterceptBrowserBack()` inspects `window.history.state.idx` (set by React Router) to decide which path to take.
+
+Focus is explicitly restored to the menu button that opened the modal. `Menu` captures the opener via `event.currentTarget` and calls `.focus({ preventScroll: true })` on it after every close path (user dismiss, Escape, or browser back button). For `Suspense`-wrapped route modals (e.g. Screenshots), the injected `onClose` is threaded through the `Suspense` boundary so the inner page component receives it correctly.
+
 ### EscapeNavigation and Stacked Escape Handling
 
 `src/components/EscapeNavigation.tsx` wraps the application in a React context that exposes a push/pop handler stack. Components that need to intercept Escape (modals, overlays) register a callback on mount and unregister on unmount. The single `window` keydown listener always invokes the _most recently registered_ handler; when the stack is empty it falls back to `navigate(-1)` (i.e. browser back-navigation), unless the user is already on the home page.

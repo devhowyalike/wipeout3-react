@@ -1,8 +1,9 @@
-import { render, act, cleanup } from "@testing-library/react";
+import { render, act, cleanup, fireEvent } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { EscapeNavigation } from "./EscapeNavigation";
 import { Modal } from "./Modal";
+import { useEscapeKey } from "./useEscapeKey";
 
 vi.mock("@/hooks/useModal", () => ({
   useModal: () => ({ isModalEnabled: true, openPopup: vi.fn() }),
@@ -18,6 +19,11 @@ function renderModal(props: Partial<React.ComponentPropsWithoutRef<typeof Modal>
       </EscapeNavigation>
     </MemoryRouter>,
   );
+}
+
+function EscapeConsumer({ handler }: { handler: () => void }) {
+  useEscapeKey(handler);
+  return null;
 }
 
 beforeEach(() => {
@@ -62,5 +68,32 @@ describe("Modal — accessible naming", () => {
     expect(document.activeElement).toBeInstanceOf(HTMLSpanElement);
     expect(document.activeElement).toHaveTextContent("Gallery");
     expect(document.activeElement).toHaveClass("sr-only");
+  });
+
+  it("unregisters its escape handler after closing itself", () => {
+    const outerHandler = vi.fn();
+
+    render(
+      <MemoryRouter>
+        <EscapeNavigation>
+          <EscapeConsumer handler={outerHandler} />
+          <Modal label="Gallery" onClose={() => {}}>
+            <p>Content</p>
+          </Modal>
+        </EscapeNavigation>
+      </MemoryRouter>,
+    );
+
+    act(() => {
+      fireEvent.keyDown(window, { key: "Escape" });
+    });
+
+    expect(document.querySelector("dialog")).toBeNull();
+
+    act(() => {
+      fireEvent.keyDown(window, { key: "Escape" });
+    });
+
+    expect(outerHandler).toHaveBeenCalledTimes(1);
   });
 });

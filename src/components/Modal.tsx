@@ -5,6 +5,77 @@ import { useEscapeKey } from "./useEscapeKey";
 import { BaseDialog } from "./ui/BaseDialog";
 import { ModalCloseButton } from "./ui/ModalCloseButton";
 
+interface ModalDialogProps {
+  children: ModalProps["children"];
+  onClose: () => void;
+  dialogName?: string;
+  labelledBy?: string;
+  initialFocus?: ModalProps["initialFocus"];
+  initialFocusRef?: ModalProps["initialFocusRef"];
+  finalModalWidth: string | number;
+  aspectRatio: number;
+}
+
+function ModalDialog({
+  children,
+  onClose,
+  dialogName,
+  labelledBy,
+  initialFocus,
+  initialFocusRef,
+  finalModalWidth,
+  aspectRatio,
+}: ModalDialogProps) {
+  useEscapeKey(onClose);
+
+  // When a label is provided and the caller hasn't specified an explicit focus
+  // target, automatically focus a sr-only span so VoiceOver announces the
+  // dialog name as the landing announcement instead of the first control.
+  const labelFocusRef = useRef<HTMLSpanElement>(null);
+  const dialogFocusRef = initialFocusRef ?? (dialogName ? labelFocusRef : undefined);
+
+  // Convert number to pixel string if needed for modal dimensions
+  const getStyleValue = (value: string | number) => {
+    if (typeof value === "number") {
+      return `${value}px`;
+    }
+    return value;
+  };
+
+  return (
+    <BaseDialog
+      closeOnBackdrop
+      onClose={onClose}
+      aria-label={dialogName}
+      aria-labelledby={labelledBy}
+      initialFocus={initialFocus}
+      initialFocusRef={dialogFocusRef}
+      className="bg-page"
+      data-overlay="true"
+    >
+      <div className="w3-app-max-width mx-auto relative flex h-full w-full items-center justify-center px-6 py-4 pointer-events-none">
+        {dialogName && !initialFocusRef && (
+          <span ref={labelFocusRef} tabIndex={-1} className="sr-only">
+            {dialogName}
+          </span>
+        )}
+        <div
+          className="relative w-full pointer-events-auto"
+          style={{
+            maxWidth: getStyleValue(finalModalWidth),
+            maxHeight: "90vh",
+            aspectRatio: aspectRatio,
+          }}
+        >
+          <div className="h-full w-full">{children}</div>
+        </div>
+
+        <ModalCloseButton onClick={onClose} />
+      </div>
+    </BaseDialog>
+  );
+}
+
 /**
  * Renders content as a centered modal overlay (with portal) or delegates to a browser popup window,
  * depending on screen size and user preference.
@@ -29,11 +100,6 @@ export function Modal({
   const [isOpen, setIsOpen] = useState(true);
   const popupWindowRef = useRef<Window | null>(null);
   const popupCloseTimeoutRef = useRef<number | null>(null);
-  // When a label is provided and the caller hasn't specified an explicit focus
-  // target, automatically focus a sr-only span so VoiceOver announces the
-  // dialog name as the landing announcement instead of the first control.
-  const labelFocusRef = useRef<HTMLSpanElement>(null);
-  const dialogFocusRef = initialFocusRef ?? (dialogName ? labelFocusRef : undefined);
 
   // Handle legacy props and defaults
   const finalPopUpWidth = popUpWidth || width;
@@ -95,50 +161,20 @@ export function Modal({
     onClose?.();
   }, [onClose]);
 
-  // Register ESC key handler with centralized escape navigation
-  useEscapeKey(handleClose);
-
   // Don't render if we're not in modal mode or if it's closed
   if (!isOpen || !isModalEnabled) return null;
 
-  // Convert number to pixel string if needed for modal dimensions
-  const getStyleValue = (value: string | number) => {
-    if (typeof value === "number") {
-      return `${value}px`;
-    }
-    return value;
-  };
-
   return (
-    <BaseDialog
-      closeOnBackdrop
+    <ModalDialog
       onClose={handleClose}
-      aria-label={dialogName}
-      aria-labelledby={labelledBy}
+      dialogName={dialogName}
+      labelledBy={labelledBy}
       initialFocus={initialFocus}
-      initialFocusRef={dialogFocusRef}
-      className="bg-page"
-      data-overlay="true"
+      initialFocusRef={initialFocusRef}
+      finalModalWidth={finalModalWidth}
+      aspectRatio={aspectRatio}
     >
-      <div className="w3-app-max-width mx-auto relative flex h-full w-full items-center justify-center px-6 py-4 pointer-events-none">
-        {dialogName && !initialFocusRef && (
-          <span ref={labelFocusRef} tabIndex={-1} className="sr-only">
-            {dialogName}
-          </span>
-        )}
-        <div
-          className="relative w-full pointer-events-auto"
-          style={{
-            maxWidth: getStyleValue(finalModalWidth),
-            maxHeight: "90vh",
-            aspectRatio: aspectRatio,
-          }}
-        >
-          <div className="h-full w-full">{children}</div>
-        </div>
-
-        <ModalCloseButton onClick={handleClose} />
-      </div>
-    </BaseDialog>
+      {children}
+    </ModalDialog>
   );
 }

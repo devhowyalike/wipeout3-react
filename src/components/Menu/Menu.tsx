@@ -3,60 +3,65 @@ import { WipeoutLink } from "../WipeoutLink/WipeoutLink";
 import { prefetchRoute } from "@/utils/prefetchRoute";
 import { remapL } from "@/utils/remapFontChars";
 import { useOptions } from "@/hooks/useOptions";
-import { useState, cloneElement, isValidElement, useEffect, useRef } from "react";
+import { useModalHistory } from "@/hooks/useModalHistory";
+import {
+  useState,
+  cloneElement,
+  isValidElement,
+  useCallback,
+  Suspense,
+} from "react";
+
+type ModalElementProps = { onClose?: () => void; children?: React.ReactNode };
+
+function injectModalOnClose(
+  element: React.ReactElement<ModalElementProps>,
+  onClose: () => void,
+) {
+  if (
+    element.type === Suspense &&
+    isValidElement<ModalElementProps>(element.props.children)
+  ) {
+    return cloneElement(element, {
+      children: cloneElement(element.props.children, { onClose }),
+    });
+  }
+
+  return cloneElement(element, { onClose });
+}
 
 /**
  * Primary navigation: {@link WipeoutLink} items, optional route prefetch, modal content with history.
- * Pushes a synthetic history entry when a modal opens so the back button closes it first.
  */
 export default function Menu({ items, prefetch = true }: MenuProps) {
-  // Aliased to avoid shadowing the remapL utility function import
   const { remapL: remapLEnabled } = useOptions();
   const [currentModalContent, setCurrentModalContent] =
     useState<React.ReactNode | null>(null);
-  // Tracks whether we pushed a synthetic history entry when a modal opened,
-  // so we know whether to pop it on close and whether a popstate event
-  // belongs to us rather than genuine page navigation.
-  const modalHistoryPushed = useRef(false);
 
-  // Closes the modal and pops the synthetic history entry we pushed when it
-  // opened, keeping the browser history stack clean.
-  const closeModal = () => {
+  const closeModal = useCallback(() => {
     setCurrentModalContent(null);
-    if (modalHistoryPushed.current) {
-      modalHistoryPushed.current = false;
-      window.history.back();
-    }
-  };
+  }, []);
 
-  // When a modal is open, intercept the browser back button (popstate) and
-  // close the modal instead of navigating away from the current page.
-  useEffect(() => {
-    if (!currentModalContent) return;
-
-    const handlePopState = () => {
-      if (modalHistoryPushed.current) {
-        modalHistoryPushed.current = false;
-        setCurrentModalContent(null);
-      }
-    };
-
-    window.addEventListener("popstate", handlePopState);
-    return () => window.removeEventListener("popstate", handlePopState);
-  }, [currentModalContent]);
+  const { prepareOpen, requestClose } = useModalHistory({
+    isOpen: currentModalContent !== null,
+    onClose: closeModal,
+  });
 
   const renderMenuItem = (item: MenuItem) => {
     const commonStyles =
       "text-nav hover:text-nav-hover active:text-nav-hover focus-visible:text-nav-hover transition-colors subpixel-fix font-wipeout3 text-w3-fluid-xl lowercase tracking-[.01em] leading-[.875]";
 
-    // Handle modal/pop-up links
     if (item.modalConfig) {
       return (
         <WipeoutLink
           as="button"
           className={commonStyles}
           animation={item.animation}
-          onClick={() => {
+          onClick={(event) => {
+            const trigger =
+              event.currentTarget instanceof HTMLElement
+                ? event.currentTarget
+                : null;
             setCurrentModalContent(null);
             setTimeout(() => {
               if (
@@ -65,17 +70,18 @@ export default function Menu({ items, prefetch = true }: MenuProps) {
               ) {
                 const modalElement = item.modalConfig
                   .content as React.ReactElement<{ onClose?: () => void }>;
-                const originalOnClose = modalElement.props.onClose;
-                const enhancedModal = cloneElement(modalElement, {
-                  onClose: () => {
-                    originalOnClose?.();
-                    closeModal();
-                  },
-                });
-                // Push a synthetic history entry (same URL) so the browser
-                // back button has somewhere to land before leaving this page.
-                window.history.pushState({ modal: true }, "");
-                modalHistoryPushed.current = true;
+                const enhancedOnClose = () => {
+                  modalElement.props.onClose?.();
+                  requestClose();
+                };
+                const enhancedModal = injectModalOnClose(
+                  modalElement,
+                  enhancedOnClose,
+                );
+
+                if (trigger) {
+                  prepareOpen(trigger);
+                }
                 setCurrentModalContent(enhancedModal);
               }
             }, 0);
@@ -86,7 +92,6 @@ export default function Menu({ items, prefetch = true }: MenuProps) {
       );
     }
 
-    // Handle undefined paths
     if (!item.path) {
       return (
         <span className={commonStyles} tabIndex={0}>
@@ -95,7 +100,6 @@ export default function Menu({ items, prefetch = true }: MenuProps) {
       );
     }
 
-    // Handle mailto and regular navigation links
     return (
       <WipeoutLink
         to={item.path}
@@ -114,14 +118,6 @@ export default function Menu({ items, prefetch = true }: MenuProps) {
           {items.map((item) => (
             <li
               key={item.id}
-              // Prefetch the lazy chunk on hover/touch for any item that has
-              // loadable content: page routes (item.path) AND modal routes
-              // (item.modalConfig) which have path:"" but still carry a lazy
-              // import. MailtoDef items pass the guard via their truthy
-              // "mailto:..." path but are harmlessly ignored by prefetchRoute
-              // (not in prefetchMap). Do NOT simplify to just `prefetch &&`
-              // without a content check — that would attach handlers to items
-              // with nothing to prefetch.
               {...(prefetch &&
                 (item.path || item.modalConfig) && {
                   onMouseEnter: () => prefetchRoute(item.id),
