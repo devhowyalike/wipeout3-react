@@ -74,7 +74,7 @@ export default function Footer() {
           role="navigation"
           className="min-w-0"
         >
-          <ul className="flex gap-x-[calc(0.2rem+1px)] gap-y-2">
+          <ul className="flex items-end gap-x-[calc(0.2rem+1px)] gap-y-2">
             <li>
               <div
                 aria-label="Version information"
