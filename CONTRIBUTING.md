@@ -59,6 +59,17 @@ pnpm build
 pnpm lint
 ```
 
+## Testing
+
+The project uses [Vitest](https://vitest.dev/) with [jsdom](https://github.com/jsdom/jsdom) and [Testing Library](https://testing-library.com/docs/react-testing-library/intro).
+
+```bash
+pnpm test          # single run
+pnpm test:watch    # watch mode
+```
+
+Tests run automatically before every `pnpm build`, so a failing test blocks the production build.
+
 ## How to Contribute
 
 ### Reporting Issues

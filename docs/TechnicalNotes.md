@@ -121,11 +121,13 @@ If `labelledBy` is set, the element it points to provides the name; otherwise `d
 VoiceOver reads the dialog's accessible name as part of the context announcement, but only if focus lands on the dialog container or an element that can relay that name. To make the name audible as the very first thing VoiceOver announces — regardless of where the `initialFocus` strategy ultimately moves focus — `Modal` renders a visually hidden `<span>` containing `dialogName` and uses it as the `initialFocusRef` target when no other ref is specified:
 
 ```tsx
-{dialogName && !initialFocusRef && (
-  <span ref={labelFocusRef} tabIndex={-1} className="sr-only">
-    {dialogName}
-  </span>
-)}
+{
+  dialogName && !initialFocusRef && (
+    <span ref={labelFocusRef} tabIndex={-1} className="sr-only">
+      {dialogName}
+    </span>
+  );
+}
 ```
 
 VoiceOver reads the span's text content on focus, giving users an immediate spoken announcement of the dialog's purpose before any interactive content is reached. The span is only rendered — and only used as the focus target — when no explicit `initialFocusRef` has been provided; callers that supply their own ref (e.g. `SettingsModal` pointing at its heading) get their own announcement through that element instead.
@@ -133,10 +135,7 @@ VoiceOver reads the span's text content on focus, giving users an immediate spok
 `BaseDialog` now exposes an explicit initial-focus API that is forwarded into `useShowModal`:
 
 ```ts
-type InitialFocusStrategy =
-  | "dialog"
-  | "first-control"
-  | "safe-action";
+type InitialFocusStrategy = "dialog" | "first-control" | "safe-action";
 
 interface BaseDialogProps extends ComponentPropsWithoutRef<"dialog"> {
   initialFocus?: InitialFocusStrategy;
