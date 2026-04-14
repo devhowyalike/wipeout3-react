@@ -186,16 +186,21 @@ Because `SettingsModal` is conditionally rendered, each unmount/remount cycle al
 
 ### Menu Modal History Management
 
-When a menu item opens a modal (e.g. Screenshots, Contact, movie clips), the `Menu` component needs to make the browser back button close the modal instead of navigating away from the page. Two strategies are used, chosen automatically based on the current history stack:
+When a menu item opens a modal (e.g. Screenshots, Contact, Movie Clips), the `Menu` component needs to make the browser back button close the modal instead of navigating away from the page. Two strategies are used, chosen automatically based on the current history stack:
 
-| Mode | When chosen | How it works |
-| --- | --- | --- |
-| **`intercept`** | Normal in-app navigation (history index > 0) | No history entry is pushed. A `popstate` listener catches the browser back button, closes the modal, and immediately calls `history.forward()` to cancel the traversal. Because no entry was added, closing the modal leaves no stale forward-stack entry. |
-| **`synthetic`** | First-entry / direct-load visits (history index = 0) | A fake `pushState({ modal: true })` entry is added so the back button has somewhere to land. Closing the modal pops it with `history.back()`. This fallback is necessary because there is no prior same-document entry to intercept on the first visit. |
+| Mode            | When chosen                                          | How it works                                                                                                                                                                                                                                               |
+| --------------- | ---------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **`intercept`** | Normal in-app navigation (history index > 0)         | No history entry is pushed. A `popstate` listener catches the browser back button, closes the modal, and immediately calls `history.forward()` to cancel the traversal. Because no entry was added, closing the modal leaves no stale forward-stack entry. |
+| **`synthetic`** | First-entry / direct-load visits (history index = 0) | A fake `pushState({ modal: true })` entry is added so the back button has somewhere to land. Closing the modal pops it with `history.back()`. This fallback is necessary because there is no prior same-document entry to intercept on the first visit.    |
 
-The strategy is tracked in a `ModalHistoryMode` ref (`"none" | "synthetic" | "intercept"`) inside `Menu`. A helper function `canInterceptBrowserBack()` inspects `window.history.state.idx` (set by React Router) to decide which path to take.
+This logic is encapsulated in the `useModalHistory` hook (`src/hooks/useModalHistory.ts`). The `ModalHistoryMode` type (`"none" | "synthetic" | "intercept"`) and the `canInterceptBrowserBack()` helper (which inspects `window.history.state.idx` set by React Router) are both defined there. The hook exposes two functions:
 
-Focus is explicitly restored to the menu button that opened the modal. `Menu` captures the opener via `event.currentTarget` and calls `.focus({ preventScroll: true })` on it after every close path (user dismiss, Escape, or browser back button). For `Suspense`-wrapped route modals (e.g. Screenshots), the injected `onClose` is threaded through the `Suspense` boundary so the inner page component receives it correctly.
+- `prepareOpen(trigger)` — called when the menu button is clicked; records the trigger element for focus restoration and sets the appropriate history mode.
+- `requestClose()` — closes the modal, restores focus to the opener, and handles history cleanup (calling `history.back()` in synthetic mode).
+
+`Menu` calls `prepareOpen(event.currentTarget)` on click and wires `requestClose` into the modal's `onClose` chain. Focus restoration is handled entirely inside the hook via a `modalTriggerRef` and a `restoreTriggerFocus()` helper.
+
+For `Suspense`-wrapped route modals (e.g. Screenshots), the injected `onClose` is threaded through the `Suspense` boundary via `injectModalOnClose()` in `Menu` so the inner page component receives it correctly.
 
 ### EscapeNavigation and Stacked Escape Handling
 
