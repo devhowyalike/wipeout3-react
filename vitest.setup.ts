@@ -1,4 +1,3 @@
-/// <reference types="@testing-library/jest-dom/vitest" />
 import "@testing-library/jest-dom/vitest";
 
 // jsdom doesn't implement HTMLDialogElement.showModal / .close
