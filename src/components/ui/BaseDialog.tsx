@@ -11,6 +11,7 @@ interface BaseDialogProps extends ComponentPropsWithoutRef<"dialog"> {
   onClose?: () => void;
   initialFocus?: InitialFocusStrategy;
   initialFocusRef?: RefObject<HTMLElement | null>;
+  focusVisible?: boolean;
 }
 
 /**
@@ -24,12 +25,13 @@ export function BaseDialog({
   onClose,
   initialFocus,
   initialFocusRef,
+  focusVisible,
   onClick,
   children,
   ...rest
 }: BaseDialogProps) {
   const dialogRef = useRef<HTMLDialogElement>(null);
-  useShowModal(dialogRef, { initialFocus, initialFocusRef });
+  useShowModal(dialogRef, { initialFocus, initialFocusRef, focusVisible });
 
   const handleClick = (e: React.MouseEvent<HTMLDialogElement>) => {
     if (closeOnBackdrop && e.target === e.currentTarget) {

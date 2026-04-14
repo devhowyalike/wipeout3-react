@@ -1,5 +1,11 @@
 import { useEffect, type RefObject } from "react";
 
+declare global {
+  interface FocusOptions {
+    focusVisible?: boolean;
+  }
+}
+
 export type InitialFocusStrategy =
   | "dialog"
   | "first-control"
@@ -8,6 +14,8 @@ export type InitialFocusStrategy =
 interface UseShowModalOptions {
   initialFocus?: InitialFocusStrategy;
   initialFocusRef?: RefObject<HTMLElement | null>;
+  /** Pass `false` to suppress `:focus-visible` on the initial programmatic focus (e.g. auto-opened modals with no preceding user interaction). */
+  focusVisible?: boolean;
 }
 
 const FOCUSABLE =
@@ -58,7 +66,7 @@ function getInitialFocusTarget(
  */
 export function useShowModal(
   ref: RefObject<HTMLDialogElement | null>,
-  { initialFocus = "dialog", initialFocusRef }: UseShowModalOptions = {},
+  { initialFocus = "dialog", initialFocusRef, focusVisible }: UseShowModalOptions = {},
 ) {
   useEffect(() => {
     const dialog = ref.current;
@@ -84,11 +92,11 @@ export function useShowModal(
     // setTimeout (not requestAnimationFrame) is required because VoiceOver
     // needs actual processing time — not just one paint frame — to absorb the
     // top-layer promotion before it will follow a focus change.
-    // `:focus-visible` suppresses the ring on pointer-opened dialogs in all
-    // browsers that this project targets (Chrome 86+, Firefox 85+, Safari 15.4+).
+    const focusOpts: FocusOptions =
+      focusVisible === false ? { focusVisible: false } : {};
     const focusTimer = shouldMoveFocus
       ? setTimeout(() => {
-          target?.focus();
+          target?.focus(focusOpts);
         }, 50)
       : null;
 
@@ -122,5 +130,5 @@ export function useShowModal(
         });
       }
     };
-  }, [initialFocus, initialFocusRef, ref]);
+  }, [initialFocus, initialFocusRef, focusVisible, ref]);
 }
