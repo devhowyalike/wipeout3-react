@@ -35,7 +35,7 @@ function DisclaimerDialog({ onClose }: { onClose: () => void }) {
       initialFocus="first-control"
       focusVisible={false}
       aria-labelledby={HEADING_ID}
-      className="bg-page/98 overflow-auto flex items-center justify-center px-6 py-8"
+      className="bg-page/98 overflow-auto hidden open:flex items-center justify-center px-6 py-8"
     >
       <div className="max-w-2xl w-full text-center space-y-6 my-auto">
         <div>
