@@ -1,4 +1,4 @@
-import { useEffect, type RefObject } from "react";
+import { useLayoutEffect, type RefObject } from "react";
 
 declare global {
   interface FocusOptions {
@@ -68,7 +68,12 @@ export function useShowModal(
   ref: RefObject<HTMLDialogElement | null>,
   { initialFocus = "dialog", initialFocusRef, focusVisible }: UseShowModalOptions = {},
 ) {
-  useEffect(() => {
+  // `useLayoutEffect` (not `useEffect`) so `showModal()` runs after the DOM
+  // commit but *before* the browser paints. With `useEffect`, an auto-opening
+  // modal (e.g. `DisclaimerModal` on first load) would let the page behind it
+  // — including skeleton loaders — paint for a frame before the dialog gets
+  // promoted to the top layer, producing a visible flash.
+  useLayoutEffect(() => {
     const dialog = ref.current;
     if (!dialog || dialog.open) return;
     const previousActiveElement =

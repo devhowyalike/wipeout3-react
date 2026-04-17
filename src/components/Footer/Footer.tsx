@@ -96,7 +96,7 @@ export default function Footer() {
             <li className="relative">
               <div
                 aria-label="Navigation type"
-                className="relative uppercase text-[9px] font-extrabold flex pl-1 whitespace-nowrap overflow-hidden text-ellipsis"
+                className="relative uppercase text-[9px] font-extrabold flex pl-1 whitespace-nowrap overflow-hidden text-ellipsis -ml-[2px]"
               >
                 <div className="absolute top-[6px] h-full border-l border-footer-nav left-0"></div>
                 {footerTitle || DEFAULT_FOOTER_MENU_TITLE}
