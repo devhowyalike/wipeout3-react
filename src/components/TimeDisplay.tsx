@@ -141,13 +141,15 @@ export default function TimeDisplay() {
                 type="button"
                 onClick={togglePause}
                 aria-label={isPaused ? "Resume countdown" : "Pause countdown"}
-                className="ml-4 inline-flex h-9 items-center justify-center rounded-md angled-corner-sm bg-white/40 px-3 text-sm font-medium text-neutral-900 transition-colors hover:bg-neutral-100/80 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-neutral-950 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 scale-125 origin-bottom sm:scale-75 dark:bg-white/40 dark:text-neutral-900 dark:hover:bg-neutral-100/80"
+                className="group ml-4 inline-flex h-9 scale-125 origin-bottom sm:scale-75 cursor-pointer disabled:pointer-events-none disabled:opacity-50"
               >
-                {isPaused ? (
-                  <PlayIcon className="h-4 w-4 shrink-0" />
-                ) : (
-                  <PauseIcon className="h-4 w-4 shrink-0" />
-                )}
+                <span className="h-full inline-flex items-center justify-center angled-corner-sm bg-white/40 group-hover:bg-neutral-100/80 px-3 text-sm font-medium text-neutral-900 transition-colors">
+                  {isPaused ? (
+                    <PlayIcon className="h-4 w-4 shrink-0" />
+                  ) : (
+                    <PauseIcon className="h-4 w-4 shrink-0" />
+                  )}
+                </span>
               </button>
             </div>
           )}

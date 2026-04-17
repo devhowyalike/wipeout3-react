@@ -3,12 +3,9 @@ import { routesConfig } from "@/routes/routes";
 import Layout from "@/components/Layout";
 import Page404 from "@/error-pages/404";
 import ResetActiveStates from "@/utils/ResetActiveStates";
-import { DisclaimerModal } from "@/components/DisclaimerModal";
-
 function App() {
   return (
     <BrowserRouter>
-      <DisclaimerModal />
       <ResetActiveStates />
       <Routes>
         <Route element={<Layout />}>

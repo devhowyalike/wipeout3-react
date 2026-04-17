@@ -1,4 +1,4 @@
-import { Outlet, useLocation } from "react-router-dom";
+import { Outlet, useLocation, useNavigationType } from "react-router-dom";
 import { OptionsProvider } from "@/providers/OptionsProvider";
 import { PageProvider } from "@/providers/PageProvider";
 import CRTEffects from "@/providers/CRTEffects";
@@ -7,8 +7,10 @@ import { useOptions } from "@/hooks/useOptions";
 import AppContainer from "./AppContainer";
 import Footer from "./Footer/Footer";
 import { EscapeNavigation } from "./EscapeNavigation";
-import { useEffect, useLayoutEffect, useRef } from "react";
+import { DisclaimerModal } from "./DisclaimerModal";
+import { useLayoutEffect, useRef } from "react";
 import { useNavigationEventGuard } from "@/hooks/useNavigationEventGuard";
+import { useRouteChangeFocus } from "@/hooks/useRouteChangeFocus";
 
 /**
  * Root layout component that mounts providers (Options, Page, Escape), the footer, and the router outlet.
@@ -18,6 +20,7 @@ export default function Layout() {
     <OptionsProvider>
       <PageProvider>
         <EscapeNavigation>
+          <DisclaimerModal />
           <LayoutContent />
         </EscapeNavigation>
       </PageProvider>
@@ -31,24 +34,21 @@ function LayoutContent() {
   const { wideCenter } = useOptions();
   const mainRef = useRef<HTMLElement>(null);
   const { pathname } = useLocation();
+  const navigationType = useNavigationType();
 
   useLayoutEffect(() => {
     setLoading(!isThemeApplied);
   }, [isThemeApplied, setLoading]);
 
   useNavigationEventGuard(mainRef, pathname);
-
-  // Reset scroll position on route change
-  useEffect(() => {
-    if (mainRef.current) {
-      mainRef.current.scrollTop = 0;
-    }
-  }, [pathname]);
+  useRouteChangeFocus(mainRef, pathname, navigationType);
 
   return (
     <CRTEffects>
       <AppContainer className="h-full flex flex-col">
-        <main ref={mainRef} className="flex-1 overflow-auto min-h-0">
+        {/* tabIndex={-1} receives programmatic focus on route changes and as a
+            fallback when a modal's original trigger unmounts. */}
+        <main ref={mainRef} tabIndex={-1} className="flex-1 overflow-auto min-h-0">
           <div className={`w-full h-full px-6 py-6 ${wideCenter ? "w3-app-max-width mx-auto" : ""}`}>
             <Outlet />
           </div>

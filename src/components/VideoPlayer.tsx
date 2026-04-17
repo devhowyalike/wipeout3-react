@@ -7,6 +7,7 @@ interface VideoPlayerProps {
   height: number;
   autoPlay?: boolean;
   nativeControls?: boolean;
+  ariaLabel?: string;
 }
 
 /**
@@ -19,9 +20,11 @@ export default function VideoPlayer({
   height,
   autoPlay = false,
   nativeControls = false,
+  ariaLabel,
 }: VideoPlayerProps) {
   const [isPlaying, setIsPlaying] = useState(autoPlay);
   const [isHovering, setIsHovering] = useState(false);
+  const [isFocusVisible, setIsFocusVisible] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
@@ -60,6 +63,7 @@ export default function VideoPlayer({
         autoPlay={autoPlay}
         controls
         playsInline
+        aria-label={ariaLabel}
       >
         <source src={src} type="video/mp4" />
       </video>
@@ -79,6 +83,7 @@ export default function VideoPlayer({
         autoPlay={autoPlay}
         playsInline
         className="cursor-pointer"
+        aria-label={ariaLabel}
         onClick={(e) => {
           e.preventDefault();
           togglePlay();
@@ -92,13 +97,15 @@ export default function VideoPlayer({
       </video>
       <div
         className={`absolute inset-0 flex items-center justify-center transition-opacity duration-300 ${
-          isPlaying && !isHovering
+          isPlaying && !isHovering && !isFocusVisible
             ? "opacity-0 pointer-events-none"
             : "opacity-100"
         }`}
       >
         <button
           onClick={togglePlay}
+          onFocus={(e) => setIsFocusVisible(e.target.matches(":focus-visible"))}
+          onBlur={() => setIsFocusVisible(false)}
           className="cursor-pointer p-4 bg-black/50 text-white hover:bg-black/70"
           aria-label={isPlaying ? "Pause video" : "Play video"}
         >

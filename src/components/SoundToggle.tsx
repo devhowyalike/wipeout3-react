@@ -59,10 +59,11 @@ export default function SoundToggle() {
       onClick={toggleSound}
       type="button"
       aria-label={!state.isMuted ? "Turn sound off" : "Turn sound on"}
-      tabIndex={0}
-      className="inline-flex h-7 w-9 items-center justify-center angled-corner-sm bg-white/40 text-neutral-900 transition-colors hover:bg-neutral-100/80 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-neutral-950 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 dark:bg-white/40 dark:text-neutral-900 dark:hover:bg-neutral-100/80"
+      className="group inline-flex h-7 w-9 cursor-pointer disabled:pointer-events-none disabled:opacity-50"
     >
-      {!state.isMuted ? <VolumeOnIcon /> : <VolumeOffIcon />}
+      <span className="h-full w-full inline-flex items-center justify-center angled-corner-sm bg-white/40 group-hover:bg-neutral-100/80 text-neutral-900 transition-colors">
+        {!state.isMuted ? <VolumeOnIcon /> : <VolumeOffIcon />}
+      </span>
     </button>
   );
 }

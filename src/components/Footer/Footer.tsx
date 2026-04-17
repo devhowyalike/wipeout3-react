@@ -27,6 +27,7 @@ export default function Footer() {
   const location = useLocation();
   const [shouldLoadSoundToggle, setShouldLoadSoundToggle] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [settingsModalKey, setSettingsModalKey] = useState(0);
 
   useEffect(() => {
     if (!options.soundToggle) return;
@@ -54,23 +55,35 @@ export default function Footer() {
     }
   };
 
+  const handleOpenSettings = () => {
+    setSettingsModalKey((prev) => prev + 1);
+    setIsSettingsOpen(true);
+  };
+
   return (
     <footer
       className={`pt-2 sticky bottom-0 w-full bg-footer text-footer-nav z-10 opacity-0 transition-opacity duration-300 ${
         !isLoading ? "opacity-100" : ""
       }`}
     >
-      <div className={`w3-app-max-width flex w-full items-end justify-between gap-6 pr-6 ${options.wideCenter ? "mx-auto" : ""}`}>
-        <nav aria-label="Secondary navigation" role="navigation" className="min-w-0">
-          <ul className="flex gap-x-[calc(0.2rem+1px)] gap-y-2">
+      <div
+        className={`w3-app-max-width flex w-full items-end justify-between gap-6 pr-6 ${options.wideCenter ? "mx-auto" : ""}`}
+      >
+        <nav
+          aria-label="Secondary navigation"
+          role="navigation"
+          className="min-w-0"
+        >
+          <ul className="flex items-end gap-x-[calc(0.2rem+1px)] gap-y-2">
             <li>
               <div
                 aria-label="Version information"
-                className="ml-1 before:content-['●'] before:text-[7px] before:relative before:-top-px before:mr-1 uppercase text-[9px] font-extrabold"
+                className="ml-1 uppercase text-[9px] font-extrabold"
               >
+                <span aria-hidden="true" className="text-[7px] relative -top-px mr-1">●</span>
                 WIPEOUT VER. 03.00.02.
               </div>
-              <Link to="/" className="block ml-6" tabIndex={0}>
+              <Link to="/" className="block ml-6">
                 <span
                   aria-label="Wipeout 3 Homepage"
                   className="uppercase text-w3-xs font-extrabold bottom-[-3px] relative"
@@ -89,8 +102,7 @@ export default function Footer() {
                 {footerTitle || DEFAULT_FOOTER_MENU_TITLE}
               </div>
               <button
-                className="block cursor-pointer -ml-[2px]"
-                tabIndex={0}
+                className="group relative -ml-[2px] block cursor-pointer pb-7"
                 onClick={handleBackButton}
                 aria-label={
                   location.pathname === "/"
@@ -100,14 +112,14 @@ export default function Footer() {
                     : "Go back"
                 }
               >
-                <span className="uppercase text-w3-xs font-extrabold bottom-[-3px] relative">
+                <span className="relative bottom-[-3px] uppercase text-w3-xs font-extrabold">
                   {location.pathname === "/"
                     ? options.psygnosisUrl
                       ? "PSY/UK"
                       : "GIT/HUB"
                     : footerSubtitle || DEFAULT_FOOTER_MENU_SUBTITLE}
                 </span>
-                <span className="w-9 h-7 block angled-corner-sm bg-accent-secondary hover:bg-accent-secondary-hover absolute bottom-0 left-[-2px]"></span>
+                <span className="absolute bottom-0 left-0 block h-7 w-9 angled-corner-sm bg-accent-secondary group-hover:bg-accent-secondary-hover"></span>
               </button>
             </li>
           </ul>
@@ -119,21 +131,23 @@ export default function Footer() {
             </Suspense>
           )}
           <button
-            onClick={() => setIsSettingsOpen(true)}
+            onClick={handleOpenSettings}
             onMouseEnter={() => void import("../SettingsModal")}
             onFocus={() => void import("../SettingsModal")}
             type="button"
             aria-label="Open settings"
-            tabIndex={0}
-            className="inline-flex h-7 w-9 items-center justify-center angled-corner-sm bg-white/40 text-neutral-900 transition-colors hover:bg-neutral-100/80 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-neutral-950 focus-visible:ring-offset-2 cursor-pointer dark:bg-white/40 dark:text-neutral-900 dark:hover:bg-neutral-100/80"
+            className="group inline-flex h-7 w-9 cursor-pointer"
           >
-            <SettingsIcon />
+            <span className="h-full w-full inline-flex items-center justify-center angled-corner-sm bg-white/40 group-hover:bg-neutral-100/80 text-neutral-900 transition-colors">
+              <SettingsIcon />
+            </span>
           </button>
         </div>
       </div>
       {isSettingsOpen && (
         <Suspense fallback={null}>
           <SettingsModal
+            key={settingsModalKey}
             options={options}
             onClose={() => setIsSettingsOpen(false)}
           />

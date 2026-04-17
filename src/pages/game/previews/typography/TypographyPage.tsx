@@ -10,6 +10,7 @@ export default function TypographyPage() {
       isFooterHidden
       className="-m-6 h-dvh w-[calc(100%+3rem)]"
     >
+      <h1 className="sr-only">Wipeout 3 Typography</h1>
       <div className="flex h-full w-full items-end justify-center overflow-hidden">
         <img
           src={typographyImage}

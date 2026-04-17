@@ -41,7 +41,7 @@ const ScreenSaversPage: React.FC = () => {
         {headerText}
       </Headline>
 
-      <TeamsLogos onTeamHover={handleTeamHover} onTeamClick={handleTeamClick} />
+      <TeamsLogos onTeamHover={handleTeamHover} onTeamClick={handleTeamClick} ariaLabelSuffix="screensaver" />
     </Page>
   );
 };

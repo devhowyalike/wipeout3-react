@@ -15,6 +15,7 @@ export default function PreviewPage() {
       footerTitle="Previews"
       footerSubtitle="Game Select"
     >
+      <h1 className="sr-only">Previews — Select a section</h1>
       <Menu items={menuItems} />
     </Page>
   );

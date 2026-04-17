@@ -182,7 +182,6 @@ export const WipeoutLink: FC<WipeoutLinkProps> = ({
             className={className}
             onTouchStart={handleTouchStart}
             onClick={handleClick}
-            tabIndex={0}
           >
             {children}
           </a>
@@ -194,7 +193,6 @@ export const WipeoutLink: FC<WipeoutLinkProps> = ({
             style={isWaitingForAnimation ? activeStyle : undefined}
             onTouchStart={handleTouchStart}
             onClick={handleClick}
-            tabIndex={0}
           >
             {children}
           </Link>
@@ -206,7 +204,6 @@ export const WipeoutLink: FC<WipeoutLinkProps> = ({
           style={isWaitingForAnimation ? activeStyle : undefined}
           onTouchStart={handleTouchStart}
           onClick={handleClick}
-          tabIndex={0}
         >
           {children}
         </button>

@@ -21,6 +21,7 @@ export default function GamePage() {
       documentTitle="Game Select"
       footerTitle="Game Select"
     >
+      <h1 className="sr-only">Game — Select a section</h1>
       <Menu items={menuItems} />
     </Page>
   );

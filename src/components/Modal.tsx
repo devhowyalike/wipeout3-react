@@ -1,8 +1,80 @@
-import { useEffect, useState, useRef } from "react";
-import { createPortal } from "react-dom";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { useModal } from "@/hooks/useModal";
 import { ModalProps } from "@/types/Modal.types";
 import { useEscapeKey } from "./useEscapeKey";
+import { BaseDialog } from "./ui/BaseDialog";
+import { ModalCloseButton } from "./ui/ModalCloseButton";
+
+interface ModalDialogProps {
+  children: ModalProps["children"];
+  onClose: () => void;
+  dialogName?: string;
+  labelledBy?: string;
+  initialFocus?: ModalProps["initialFocus"];
+  initialFocusRef?: ModalProps["initialFocusRef"];
+  finalModalWidth: string | number;
+  aspectRatio: number;
+}
+
+function ModalDialog({
+  children,
+  onClose,
+  dialogName,
+  labelledBy,
+  initialFocus,
+  initialFocusRef,
+  finalModalWidth,
+  aspectRatio,
+}: ModalDialogProps) {
+  useEscapeKey(onClose);
+
+  // When a label is provided and the caller hasn't specified an explicit focus
+  // target, automatically focus a sr-only span so VoiceOver announces the
+  // dialog name as the landing announcement instead of the first control.
+  const labelFocusRef = useRef<HTMLSpanElement>(null);
+  const dialogFocusRef = initialFocusRef ?? (dialogName ? labelFocusRef : undefined);
+
+  // Convert number to pixel string if needed for modal dimensions
+  const getStyleValue = (value: string | number) => {
+    if (typeof value === "number") {
+      return `${value}px`;
+    }
+    return value;
+  };
+
+  return (
+    <BaseDialog
+      closeOnBackdrop
+      onClose={onClose}
+      aria-label={dialogName}
+      aria-labelledby={labelledBy}
+      initialFocus={initialFocus}
+      initialFocusRef={dialogFocusRef}
+      className="bg-page"
+      data-overlay="true"
+    >
+      <div className="w3-app-max-width mx-auto relative flex h-full w-full items-center justify-center px-6 py-4 pointer-events-none">
+        {dialogName && !initialFocusRef && (
+          <span ref={labelFocusRef} tabIndex={-1} className="sr-only">
+            {dialogName}
+          </span>
+        )}
+        <div
+          className="relative w-full pointer-events-auto"
+          style={{
+            maxWidth: getStyleValue(finalModalWidth),
+            maxHeight: "90vh",
+            aspectRatio: aspectRatio,
+          }}
+        >
+          <div className="h-full w-full">{children}</div>
+        </div>
+
+        <ModalCloseButton onClick={onClose} />
+      </div>
+    </BaseDialog>
+  );
+}
 
 /**
  * Renders content as a centered modal overlay (with portal) or delegates to a browser popup window,
@@ -17,12 +89,17 @@ export function Modal({
   height = 400,
   isPopUp,
   onClose,
+  label,
+  labelledBy,
+  initialFocus,
+  initialFocusRef,
 }: ModalProps) {
+  const dialogName = label ?? (labelledBy ? undefined : "Dialog");
+
   const { isModalEnabled, openPopup } = useModal(isPopUp);
   const [isOpen, setIsOpen] = useState(true);
   const popupWindowRef = useRef<Window | null>(null);
   const popupCloseTimeoutRef = useRef<number | null>(null);
-  const previousActiveElementRef = useRef<HTMLElement | null>(null);
 
   // Handle legacy props and defaults
   const finalPopUpWidth = popUpWidth || width;
@@ -31,9 +108,6 @@ export function Modal({
   const aspectRatio = finalPopUpWidth / finalPopUpHeight;
 
   useEffect(() => {
-    // Store the previously focused element when modal opens
-    previousActiveElementRef.current = document.activeElement as HTMLElement;
-
     if (popupCloseTimeoutRef.current !== null) {
       window.clearTimeout(popupCloseTimeoutRef.current);
       popupCloseTimeoutRef.current = null;
@@ -53,7 +127,7 @@ export function Modal({
         finalPopUpWidth,
         finalPopUpHeight,
         children,
-        onClose
+        onClose,
       );
       if (popup) {
         popupWindowRef.current = popup;
@@ -82,72 +156,25 @@ export function Modal({
     onClose,
   ]);
 
-  const handleClose = () => {
+  const handleClose = useCallback(() => {
     setIsOpen(false);
-    // Blur the previously focused element to remove active state
-    if (previousActiveElementRef.current) {
-      previousActiveElementRef.current.blur();
-    }
-    if (onClose) {
-      onClose();
-    }
-  };
-
-  // Register ESC key handler with centralized escape navigation
-  useEscapeKey(handleClose);
-
-  const handleOverlayClick = (e: React.MouseEvent) => {
-    if (e.target === e.currentTarget) {
-      handleClose();
-    }
-  };
+    onClose?.();
+  }, [onClose]);
 
   // Don't render if we're not in modal mode or if it's closed
   if (!isOpen || !isModalEnabled) return null;
 
-  // Convert number to pixel string if needed for modal dimensions
-  const getStyleValue = (value: string | number) => {
-    if (typeof value === "number") {
-      return `${value}px`;
-    }
-    return value;
-  };
-
   return (
-    <>
-      {createPortal(
-        <div
-          className="fixed inset-0 z-40 bg-page"
-          onClick={handleOverlayClick}
-          data-overlay="true"
-        >
-          <div
-            className="w3-app-max-width mx-auto relative flex h-full w-full items-center justify-center px-6 py-4"
-            onClick={handleOverlayClick}
-          >
-            <button
-              tabIndex={0}
-              onClick={handleClose}
-              className="absolute top-4 right-6 z-50 cursor-pointer text-nav hover:text-nav-hover font-wipeout3 text-5xl"
-              aria-label="Close modal"
-            >
-              ×
-            </button>
-
-            <div
-              className="relative w-full"
-              style={{
-                maxWidth: getStyleValue(finalModalWidth),
-                maxHeight: "90vh",
-                aspectRatio: aspectRatio,
-              }}
-            >
-              <div className="h-full w-full">{children}</div>
-            </div>
-          </div>
-        </div>,
-        document.body
-      )}
-    </>
+    <ModalDialog
+      onClose={handleClose}
+      dialogName={dialogName}
+      labelledBy={labelledBy}
+      initialFocus={initialFocus}
+      initialFocusRef={initialFocusRef}
+      finalModalWidth={finalModalWidth}
+      aspectRatio={aspectRatio}
+    >
+      {children}
+    </ModalDialog>
   );
 }

@@ -1,6 +1,9 @@
+import type { ReactNode, RefObject } from "react";
+import type { InitialFocusStrategy } from "@/hooks/useShowModal";
+
 /** Props for the `Modal` component that renders content as an overlay or popup window. */
 export interface ModalProps {
-  children: React.ReactNode;
+  children: ReactNode;
   // Dimensions for popup window
   popUpWidth?: number;
   popUpHeight?: number;
@@ -16,4 +19,12 @@ export interface ModalProps {
   isPopUp?: boolean;
   // Callback when modal is closed
   onClose?: () => void;
+  // Optional accessible-name source for the underlying dialog
+  labelledBy?: string;
+  // Optional direct accessible name for the underlying dialog
+  label?: string;
+  // Optional initial-focus strategy forwarded to BaseDialog
+  initialFocus?: InitialFocusStrategy;
+  // Optional initial-focus target forwarded to BaseDialog
+  initialFocusRef?: RefObject<HTMLElement | null>;
 }

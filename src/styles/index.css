@@ -110,6 +110,10 @@
   clip-path: polygon(0 0, calc(100% - 3px) 0, 100% 22%, 100% 100%, 0 100%);
 }
 
+@utility angled-corner-btn-lg {
+  clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 22%, 100% 100%, 0 100%);
+}
+
 @utility subpixel-fix {
   opacity: 0.9999;
 }
@@ -142,6 +146,43 @@
   button:disabled,
   [aria-disabled="true"] {
     cursor: not-allowed;
+  }
+
+  /* Hide focus ring for mouse/touch; show it only for keyboard navigation */
+  :focus:not(:focus-visible) {
+    outline: none;
+  }
+
+  /* tabindex="-1" elements are only ever focused programmatically (e.g. h1 on
+     route change, sr-only landmarks). Never show an outline on them, even when
+     the browser's focus-visible heuristic fires because the trigger was a key. */
+  [tabindex="-1"]:focus,
+  [tabindex="-1"]:focus-visible {
+    outline: none;
+  }
+
+  :focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 3px;
+  }
+
+  dialog[open] {
+    position: fixed;
+    inset: 0;
+    margin: 0;
+    padding: 0;
+    border: none;
+    outline: none;
+    max-width: none;
+    max-height: none;
+    width: 100%;
+    height: 100%;
+    background: transparent;
+    pointer-events: auto;
+  }
+
+  dialog::backdrop {
+    background: transparent;
   }
 
   :root {

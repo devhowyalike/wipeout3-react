@@ -25,6 +25,10 @@ export default function MitdrPage() {
     setActiveEffect(null);
   };
 
+  const handleClick = (letter: EffectLetter) => {
+    setActiveEffect((prev) => (prev === letter ? null : letter));
+  };
+
   const textContent: TextSegment[] = [
     // \n for line breaks
     // Line 1
@@ -64,6 +68,13 @@ export default function MitdrPage() {
                     handleMouseEnter(letter.toLowerCase() as EffectLetter)
                   }
                   onMouseLeave={handleMouseLeave}
+                  onFocus={() =>
+                    handleMouseEnter(letter.toLowerCase() as EffectLetter)
+                  }
+                  onBlur={handleMouseLeave}
+                  onClick={() =>
+                    handleClick(letter.toLowerCase() as EffectLetter)
+                  }
                   className="cursor-pointer"
                   aria-pressed={activeEffect === letter.toLowerCase()}
                   aria-label={`Activate ${letter} effect`}

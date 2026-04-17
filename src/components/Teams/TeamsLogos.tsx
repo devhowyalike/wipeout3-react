@@ -6,6 +6,7 @@ import "./teamsLogos.css";
 interface TeamsLogosProps {
   onTeamHover: (teamId: string) => void;
   onTeamClick?: (teamId: string) => void;
+  ariaLabelSuffix?: string;
 }
 
 /**
@@ -14,6 +15,7 @@ interface TeamsLogosProps {
 export const TeamsLogos: React.FC<TeamsLogosProps> = ({
   onTeamHover,
   onTeamClick,
+  ariaLabelSuffix,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -61,6 +63,7 @@ export const TeamsLogos: React.FC<TeamsLogosProps> = ({
             iconId={leftColumnIcons.top}
             onHover={handleTeamHover}
             onClick={onTeamClick}
+            ariaLabelSuffix={ariaLabelSuffix}
           />
           <div className="flex flex-col space-y-1">
             {leftColumnIcons.middle.map((iconId) => (
@@ -69,6 +72,7 @@ export const TeamsLogos: React.FC<TeamsLogosProps> = ({
                 iconId={iconId}
                 onHover={handleTeamHover}
                 onClick={onTeamClick}
+                ariaLabelSuffix={ariaLabelSuffix}
               />
             ))}
           </div>
@@ -76,6 +80,7 @@ export const TeamsLogos: React.FC<TeamsLogosProps> = ({
             iconId={leftColumnIcons.bottom}
             onHover={handleTeamHover}
             onClick={onTeamClick}
+            ariaLabelSuffix={ariaLabelSuffix}
           />
         </div>
 
@@ -87,6 +92,7 @@ export const TeamsLogos: React.FC<TeamsLogosProps> = ({
               iconId={iconId}
               onHover={handleTeamHover}
               onClick={onTeamClick}
+              ariaLabelSuffix={ariaLabelSuffix}
             />
           ))}
         </div>

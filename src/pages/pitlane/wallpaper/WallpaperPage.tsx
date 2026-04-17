@@ -21,9 +21,9 @@ export default function WallpaperPage() {
             <W3RightArrow size="lg" />
           </div>
           <section className="md:pt-[90px]">
-            <article className="mb-7">
+            <div className="mb-7">
               <WallpaperTable />
-            </article>
+            </div>
           </section>
         </div>
       </div>

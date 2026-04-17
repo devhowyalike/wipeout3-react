@@ -11,6 +11,7 @@ interface AngryManIconProps {
   highlightFillActive?: string;
   isHovered?: boolean;
   className?: string;
+  "aria-label"?: string;
 }
 
 const sizeClasses: Record<Size, { dimensions: string }> = {
@@ -31,6 +32,7 @@ const AngryManIcon = ({
   highlightFillActive = "#ff00ff",
   isHovered = false,
   className = "",
+  "aria-label": ariaLabel,
 }: AngryManIconProps) => {
   const [blinkDelay, setBlinkDelay] = useState("1.5s");
 
@@ -60,6 +62,9 @@ const AngryManIcon = ({
         className="block"
         fill={currentFill}
         preserveAspectRatio="xMidYMid meet"
+        {...(ariaLabel
+          ? { role: "img", "aria-label": ariaLabel }
+          : { "aria-hidden": true })}
       >
         {blink && (
           <style>

@@ -43,7 +43,7 @@ const DeveloperIconLayout = ({
   // Delay before resuming cycle after hover ends
   const RESUME_DELAY = 1000;
 
-  // Handle hover events
+  // Handle hover events (called from DeveloperIcon focus/mouse handlers)
   const handleIconHover = (developer: (typeof teamMembers)[0] | null) => {
     // Clear any pending resume timer
     if (resumeTimerRef.current) {
@@ -51,19 +51,15 @@ const DeveloperIconLayout = ({
       resumeTimerRef.current = null;
     }
 
-    // If developer is null, it means hover ended
     if (developer === null) {
-      // Set a timer to resume the cycle after a delay
       resumeTimerRef.current = setTimeout(() => {
         setIsCyclePaused(false);
         resumeTimerRef.current = null;
       }, RESUME_DELAY);
     } else {
-      // Immediately pause the cycle when hovering
       setIsCyclePaused(true);
     }
 
-    // Always pass the hover to the parent component
     onHover(developer);
   };
 
@@ -108,10 +104,8 @@ const DeveloperIconLayout = ({
 
   // Update developer details when the cycling highlight changes
   useEffect(() => {
-    // Only update the highlighted developer details if not paused
     if (!isCyclePaused && highlightedIndex !== null) {
       const developer = teamMembers[highlightedIndex];
-      // Don't play sound when cycling
       onHover(
         highlightedIndex === teamMembers.length - 1
           ? {

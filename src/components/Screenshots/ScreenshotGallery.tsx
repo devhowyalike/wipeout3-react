@@ -35,6 +35,11 @@ const ScreenshotGallery = () => {
   const touchStartXRef = useRef<number | null>(null);
   const touchEndXRef = useRef<number | null>(null);
   const galleryRef = useRef<HTMLDivElement>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
+  const viewerHeadingRef = useRef<HTMLSpanElement>(null);
+  const shouldFocusViewerRef = useRef(false);
+  // Set when navigating back so the useEffect can focus the first menu button.
+  const shouldFocusMenuRef = useRef(false);
 
   // Swipe hint + live drag direction feedback
   // (pointer: coarse) is true on touch-primary devices (phones/tablets), false on mouse/trackpad
@@ -74,6 +79,13 @@ const ScreenshotGallery = () => {
 
   // Handle going back to the main menu
   const handleBackToMenu = useCallback(() => {
+    // Park focus on the nearest dialog before the currently-focused button
+    // unmounts. Without this, the browser moves focus to <body>, which is
+    // inert behind the top-layer backdrop, and macOS escalates it to the
+    // browser chrome.
+    const dialog = galleryRef.current?.closest("dialog");
+    if (dialog instanceof HTMLElement) dialog.focus();
+    shouldFocusMenuRef.current = true;
     setCurrentScreen(null);
   }, []);
 
@@ -235,6 +247,34 @@ const ScreenshotGallery = () => {
     handleBackToMenu,
   ]);
 
+  // After returning to the menu, move focus to the first menu button so it
+  // stays inside the dialog rather than landing on the dialog container.
+  useEffect(() => {
+    if (currentScreen !== null || !shouldFocusMenuRef.current) return;
+    shouldFocusMenuRef.current = false;
+
+    const focusTimer = window.setTimeout(() => {
+      menuRef.current?.querySelector<HTMLElement>("button")?.focus();
+    }, 50);
+
+    return () => window.clearTimeout(focusTimer);
+  }, [currentScreen]);
+
+  // When entering the viewer from the menu, focus a short status heading so
+  // screen reader users hear the current set and item count before the nav
+  // controls. Do not do this during next/previous navigation, which should
+  // leave focus on the activated control.
+  useEffect(() => {
+    if (currentScreen === null || !shouldFocusViewerRef.current) return;
+    shouldFocusViewerRef.current = false;
+
+    const focusTimer = window.setTimeout(() => {
+      viewerHeadingRef.current?.focus();
+    }, 50);
+
+    return () => window.clearTimeout(focusTimer);
+  }, [currentScreen]);
+
   const currentScreenId = currentScreen?.id;
 
   // Show swipe hint whenever user opens a screenshot set (touch devices only, not during active swiping)
@@ -309,20 +349,24 @@ const ScreenshotGallery = () => {
   // Main menu view
   if (!currentScreen) {
     return (
-      <div className="bg-screenshot space-y-[3px]">
+      <div ref={menuRef} className="bg-screenshot space-y-[3px]">
         {screenshotsData.screenshots.map((item, index) => (
-          <div
+          <button
             key={item.id}
-            onClick={() => handleSelectScreen(item, index)}
-            className="cursor-pointer"
+            onClick={() => {
+              shouldFocusViewerRef.current = true;
+              handleSelectScreen(item, index);
+            }}
+            aria-label={`View ${item.name} screenshots`}
+            className="block w-full cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-1"
           >
             <img
               src={getTitleCardImage(item.titleCard)}
-              alt={item.name}
+              alt=""
               loading="lazy"
               decoding="async"
             />
-          </div>
+          </button>
         ))}
       </div>
     );
@@ -331,12 +375,19 @@ const ScreenshotGallery = () => {
   // Screenshot viewer
   return (
     <div ref={galleryRef}>
-      <div onClick={handleBackToMenu} className="cursor-pointer">
+      <span ref={viewerHeadingRef} tabIndex={-1} className="sr-only">
+        {currentScreen.name} screenshots
+      </span>
+      <button
+        onClick={handleBackToMenu}
+        aria-label={`Back to screenshot menu (currently viewing ${currentScreen.name})`}
+        className="block w-full cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-1"
+      >
         <img
           src={getTitleCardImage(currentScreen.titleCard)}
-          alt={`${currentScreen.name} title card`}
+          alt=""
         />
-      </div>
+      </button>
 
       {/* Screenshot display */}
       <div
@@ -417,10 +468,13 @@ const ScreenshotGallery = () => {
           <div className="flex flex-col">
             <div className="flex">
               <button
-                className="cursor-pointer"
+                aria-label="Previous screenshot"
+                className="cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-1"
                 onClick={handlePrevClick}
                 onMouseEnter={() => handlePrevHover(true)}
                 onMouseLeave={() => handlePrevHover(false)}
+                onFocus={() => handlePrevHover(true)}
+                onBlur={() => handlePrevHover(false)}
               >
                 <img
                   src={
@@ -430,14 +484,17 @@ const ScreenshotGallery = () => {
                       ? uiMap.ltab_on
                       : uiMap.ltab_off
                   }
-                  alt="Previous"
+                  alt=""
                 />
               </button>
               <button
-                className="cursor-pointer"
+                aria-label="Next screenshot"
+                className="cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-1"
                 onClick={handleNextClick}
                 onMouseEnter={() => handleNextHover(true)}
                 onMouseLeave={() => handleNextHover(false)}
+                onFocus={() => handleNextHover(true)}
+                onBlur={() => handleNextHover(false)}
               >
                 <img
                   src={
@@ -447,25 +504,20 @@ const ScreenshotGallery = () => {
                       ? uiMap.rtab_on
                       : uiMap.rtab_off
                   }
-                  alt="Next"
+                  alt=""
                 />
               </button>
             </div>
             <button
+              aria-label="Back to menu"
+              className="cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-1"
               onClick={handleBackToMenu}
               onMouseEnter={() => handleMenuHover(true)}
               onMouseLeave={() => handleMenuHover(false)}
+              onFocus={() => handleMenuHover(true)}
+              onBlur={() => handleMenuHover(false)}
             >
-              <img
-                src={getNavImage()}
-                alt={
-                  uiState.prevHovered || uiState.prevKeyActive
-                    ? "Previous"
-                    : uiState.nextHovered || uiState.nextKeyActive
-                      ? "Next"
-                      : "Menu"
-                }
-              />
+              <img src={getNavImage()} alt="" />
             </button>
           </div>
         </div>

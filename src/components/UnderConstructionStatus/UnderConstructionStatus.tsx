@@ -128,7 +128,7 @@ export default function UnderConstructionStatus({
       >
         <div className="relative z-1 flex flex-row items-start gap-x-6 gap-y-3 max-sm:flex-col sm:gap-y-5">
           <div className="flex-1 min-w-0">
-            <hr className="mb-2.5 h-0 border-0 border-t border-black" />
+            <hr className="mb-2.5 h-0 border-0 border-t border-black" aria-hidden />
             <h2 className="mb-[0.2rem] text-[1.375rem] leading-[1.15] font-normal uppercase tracking-wider text-stone-900">
               {title}
             </h2>

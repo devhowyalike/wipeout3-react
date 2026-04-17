@@ -20,13 +20,14 @@ export default function MoviesPage() {
       animation: getMovieAnimation(movie.id),
       modalConfig: {
         content: (
-          <Modal width={movie.width} height={movie.height}>
+          <Modal width={movie.width} height={movie.height} label={`${movie.name} movie clip`}>
             <VideoPlayer
               src={movie.src}
               width={movie.width}
               height={movie.height}
               autoPlay
               nativeControls={!modalEnabled}
+              ariaLabel={`${movie.name} movie clip`}
             />
           </Modal>
         ),
@@ -41,6 +42,7 @@ export default function MoviesPage() {
       footerTitle="Movie Clips"
       footerSubtitle="Previews Select"
     >
+      <h1 className="sr-only">Movie Clips — Select a clip</h1>
       <Menu items={menuItems} />
     </Page>
   );

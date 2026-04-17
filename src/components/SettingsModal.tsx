@@ -1,6 +1,4 @@
-import { useCallback, useState } from "react";
-import { useBodyScrollLock } from "@/hooks/useBodyScrollLock";
-import { createPortal } from "react-dom";
+import { useCallback, useRef, useState } from "react";
 import { useEscapeKey } from "./useEscapeKey";
 import {
   type AppOptions,
@@ -18,6 +16,9 @@ import { useSettingsScroll } from "./settings/useSettingsScroll";
 import { OptionsAccordion } from "./settings/OptionsAccordion";
 import { ModesAccordion } from "./settings/ModesAccordion";
 import { DiscardConfirmOverlay } from "./settings/DiscardConfirmOverlay";
+import { BaseDialog } from "./ui/BaseDialog";
+import { ModalCloseButton } from "./ui/ModalCloseButton";
+import { AngledButton } from "./ui/AngledButton";
 
 interface SettingsModalProps {
   options: AppOptions;
@@ -28,6 +29,7 @@ const OPTION_KEYS = Object.keys(OPTION_LABELS) as OptionKey[];
 const ALL_OPTION_VALUES = [...OPTION_KEYS];
 const ALL_MODE_VALUES = Object.keys(MODE_DESCRIPTIONS);
 const SCROLL_AREA_FALLBACK_HEIGHT = "70dvh";
+const HEADING_ID = "settings-modal-heading";
 
 /**
  * Full-screen options editor in a portal: toggles, Pure/React mode accordions,
@@ -37,6 +39,7 @@ export default function SettingsModal({
   options,
   onClose,
 }: SettingsModalProps) {
+  const headingFocusRef = useRef<HTMLHeadingElement>(null);
   const [draft, setDraft] = useState<AppOptions>({ ...options });
   // Mode descriptions (Pure / React Mode) are expanded by default
   // to surface them on first visit. Overridden by the user's preference.
@@ -83,8 +86,6 @@ export default function SettingsModal({
   }, [confirmingDiscard, hasChanges, onClose]);
 
   useEscapeKey(handleRequestClose);
-
-  useBodyScrollLock();
 
   const handleToggle = (key: OptionKey) => {
     setDraft((prev) => {
@@ -140,10 +141,6 @@ export default function SettingsModal({
     window.location.reload();
   };
 
-  const handleOverlayClick = (e: React.MouseEvent) => {
-    if (e.target === e.currentTarget) handleRequestClose();
-  };
-
   const handleToggleAll = () => {
     if (allExpanded) {
       setOpenItems([]);
@@ -159,124 +156,117 @@ export default function SettingsModal({
   const modalFrameClass =
     "w3-app-max-width mx-auto relative flex h-full w-full items-center justify-center px-6 py-4";
 
-  return createPortal(
-    <div
-      className="fixed inset-0 z-40 bg-page"
-      onClick={handleOverlayClick}
+  return (
+    <BaseDialog
+      closeOnBackdrop
+      onClose={handleRequestClose}
+      initialFocusRef={headingFocusRef}
+      aria-labelledby={HEADING_ID}
+      className="bg-page"
       data-overlay="true"
       data-theme="sandTheme"
     >
-      <div
-        className={modalFrameClass}
-        onClick={handleOverlayClick}
-      >
-        <button
-          tabIndex={0}
-          onClick={handleRequestClose}
-          className="absolute top-4 right-6 z-60 cursor-pointer text-nav hover:text-nav-hover font-wipeout3 text-5xl"
-          aria-label="Close settings"
-        >
-          ×
-        </button>
+      <div className={`${modalFrameClass} pointer-events-none`}>
+        <ModalCloseButton onClick={handleRequestClose} label="Close settings" />
 
-        <div
-          className="relative w-full max-w-md mx-4 flex flex-col"
-          style={{ maxHeight: modalMaxHeight ? `${modalMaxHeight}px` : "90vh" }}
-        >
-          <div ref={headerRef} className="mb-6 shrink-0">
-            <div className="max-w-[340px]">
-              <span className="uppercase text-nav font-wipeout3 text-w3-fluid-xl tracking-wide">
-                Options
-              </span>
-            </div>
-          </div>
-
-          <div className="relative min-h-0 overflow-hidden">
-            <div
-              ref={scrollContainerRef}
-              className="settings-scrollbar pr-6 overflow-x-hidden overflow-y-auto overscroll-contain"
-              style={{
-                maxHeight: scrollAreaMaxHeight
-                  ? `${scrollAreaMaxHeight}px`
-                  : SCROLL_AREA_FALLBACK_HEIGHT,
-                minHeight: scrollAreaMaxHeight
-                  ? `${scrollAreaMaxHeight}px`
-                  : SCROLL_AREA_FALLBACK_HEIGHT,
-              }}
-            >
-              <div ref={scrollContentRef}>
-                <OptionsAccordion
-                  draft={draft}
-                  openItems={openItems}
-                  onOpenItemsChange={setOpenItems}
-                  onToggle={handleToggle}
-                  optionKeys={OPTION_KEYS}
-                />
-                <ModesAccordion
-                  draft={draft}
-                  openModeItems={openModeItems}
-                  onOpenModeItemsChange={setOpenModeItems}
-                  onPureModeToggle={handlePureModeToggle}
-                  onReactModeToggle={handleReactModeToggle}
-                />
+        <div className="relative w-full max-w-md mx-4 pointer-events-auto">
+          <div
+            className="relative flex w-full flex-col"
+            style={{ maxHeight: modalMaxHeight ? `${modalMaxHeight}px` : "90vh" }}
+          >
+            <div ref={headerRef} className="mb-6 shrink-0">
+              <div className="max-w-[340px]">
+                <h2
+                  ref={headingFocusRef}
+                  id={HEADING_ID}
+                  className="uppercase text-nav font-wipeout3 text-w3-fluid-xl tracking-wide"
+                >
+                  Options
+                </h2>
               </div>
             </div>
 
-            {scrollbarMetrics.visible && (
+            <div className="relative min-h-0 overflow-hidden">
               <div
-                aria-hidden="true"
-                className="pointer-events-none absolute inset-y-0 right-0 w-2 bg-white/30"
+                ref={scrollContainerRef}
+                className="settings-scrollbar pr-6 overflow-x-hidden overflow-y-auto overscroll-contain"
+                style={{
+                  maxHeight: scrollAreaMaxHeight
+                    ? `${scrollAreaMaxHeight}px`
+                    : SCROLL_AREA_FALLBACK_HEIGHT,
+                  minHeight: scrollAreaMaxHeight
+                    ? `${scrollAreaMaxHeight}px`
+                    : SCROLL_AREA_FALLBACK_HEIGHT,
+                }}
               >
-                <div
-                  className="absolute inset-x-0 bg-white"
-                  style={{
-                    height: `${scrollbarMetrics.thumbHeight}px`,
-                    transform: `translateY(${scrollbarMetrics.thumbOffset}px)`,
-                  }}
-                />
+                <div ref={scrollContentRef}>
+                  <OptionsAccordion
+                    draft={draft}
+                    openItems={openItems}
+                    onOpenItemsChange={setOpenItems}
+                    onToggle={handleToggle}
+                    optionKeys={OPTION_KEYS}
+                  />
+                  <ModesAccordion
+                    draft={draft}
+                    openModeItems={openModeItems}
+                    onOpenModeItemsChange={setOpenModeItems}
+                    onPureModeToggle={handlePureModeToggle}
+                    onReactModeToggle={handleReactModeToggle}
+                  />
+                </div>
               </div>
-            )}
-          </div>
 
-          <div ref={footerRef} className="mt-4 shrink-0 flex items-end pb-1">
-            <div className="flex items-center gap-2">
+              {scrollbarMetrics.visible && (
+                <div
+                  aria-hidden="true"
+                  className="pointer-events-none absolute inset-y-0 right-0 w-2 bg-white/30"
+                >
+                  <div
+                    className="absolute inset-x-0 bg-white"
+                    style={{
+                      height: `${scrollbarMetrics.thumbHeight}px`,
+                      transform: `translateY(${scrollbarMetrics.thumbOffset}px)`,
+                    }}
+                  />
+                </div>
+              )}
+            </div>
+
+            <div ref={footerRef} className="mt-4 shrink-0 flex items-end pb-1">
+              <div className="flex items-center gap-2">
+                <AngledButton variant="secondary" onClick={handleRequestClose}>
+                  Cancel
+                </AngledButton>
+                <AngledButton
+                  variant="primary"
+                  onClick={handleApply}
+                  disabled={!hasChanges}
+                >
+                  Apply
+                </AngledButton>
+              </div>
+              <div className="flex-1 flex items-center justify-start">
+                <span className="text-white/20 font-bold pl-2">|</span>
+              </div>
               <button
                 type="button"
-                onClick={handleRequestClose}
-                className="angled-corner-sm bg-white/20 hover:bg-white/30 px-6 h-7 uppercase text-xs font-extrabold tracking-wide text-nav cursor-pointer transition-colors"
+                onClick={handleToggleAll}
+                className="w-[148px] text-right uppercase text-xs font-extrabold tracking-wide text-white/40 hover:text-white/70 cursor-pointer transition-colors focus-visible:outline-hidden focus-visible:text-white focus-visible:ring-2 focus-visible:ring-white/70 focus-visible:ring-offset-2 focus-visible:ring-offset-page"
               >
-                Cancel
-              </button>
-              <button
-                type="button"
-                onClick={handleApply}
-                disabled={!hasChanges}
-                className="angled-corner-sm px-6 h-7 uppercase text-xs font-extrabold tracking-wide transition-colors disabled:opacity-40 disabled:cursor-not-allowed bg-accent-primary hover:bg-accent-primary-hover text-white cursor-pointer"
-              >
-                Apply
+                {allExpanded ? "Eject Desc" : "Actv8 Desc"}
               </button>
             </div>
-            <div className="flex-1 flex items-center justify-start">
-              <span className="text-white/20 font-bold pl-2">|</span>
-            </div>
-            <button
-              type="button"
-              onClick={handleToggleAll}
-              className="w-[148px] text-right uppercase text-xs font-extrabold tracking-wide text-white/40 hover:text-white/70 cursor-pointer transition-colors"
-            >
-              {allExpanded ? "Eject Desc" : "Actv8 Desc"}
-            </button>
           </div>
-
-          {confirmingDiscard && (
-            <DiscardConfirmOverlay
-              onDiscard={onClose}
-              onEdit={() => setConfirmingDiscard(false)}
-            />
-          )}
         </div>
+
+        {confirmingDiscard && (
+          <DiscardConfirmOverlay
+            onDiscard={onClose}
+            onEdit={() => setConfirmingDiscard(false)}
+          />
+        )}
       </div>
-    </div>,
-    document.body,
+    </BaseDialog>
   );
 }

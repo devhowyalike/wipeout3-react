@@ -77,11 +77,18 @@ export const DeveloperIcon = ({
     onHover(null);
   };
 
+  const ariaLabel = isAngryMan
+    ? `${angryManLogo.firstName} ${angryManLogo.lastName}, ${angryManLogo.fullTitle}`
+    : `${developer.firstName} ${developer.lastName}, ${developer.title}`;
+
   return (
-    <div
-      className="cursor-pointer h-full flex items-end"
+    <button
+      className="w-full cursor-pointer h-full flex items-end focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-1"
+      aria-label={ariaLabel}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
+      onFocus={handleMouseEnter}
+      onBlur={handleMouseLeave}
     >
       {isAngryMan ? (
         <div className="flex items-end justify-center w-full">
@@ -101,6 +108,6 @@ export const DeveloperIcon = ({
           fill={fillColor}
         />
       )}
-    </div>
+    </button>
   );
 };

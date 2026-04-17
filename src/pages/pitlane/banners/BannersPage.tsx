@@ -41,6 +41,7 @@ export default function BannersPage() {
           height={modalHeight}
           // Don't exceed largest video width or the banner modal cap
           modalWidth={`min(80vw, ${getVideoWidth("lg")}px, var(--w3-banner-max-width))`}
+          label={`${banner.name} team banner animation`}
           onClose={() => {
             bannerRefs.current[banner.id]?.cleanup();
           }}
@@ -64,6 +65,7 @@ export default function BannersPage() {
       footerTitle="Banners"
       footerSubtitle="Pitlane Select"
     >
+      <h1 className="sr-only">Banners — Select a team</h1>
       <Menu items={menuItems} />
       {bannersFlash && (
         <Suspense fallback={null}>

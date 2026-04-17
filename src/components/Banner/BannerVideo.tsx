@@ -4,6 +4,7 @@ import {
   videoResolutions,
   breakpoints,
 } from "@/components/Banner/bannerConfig";
+import { getBannerById } from "@/components/Banner/bannerData";
 
 /**
  * Banner as autoplaying, muted, looping MP4; picks resolution from breakpoints on resize.
@@ -59,6 +60,11 @@ export const BannerVideo = forwardRef<BannerHandle, BannerProps>(
       return null;
     }
 
+    const bannerName = getBannerById(bannerId)?.name;
+    const videoLabel = bannerName
+      ? `${bannerName} team banner animation`
+      : "Team banner animation";
+
     return (
       <div className="banner-container w-full h-full flex items-center justify-center">
         {videoSrc && (
@@ -70,6 +76,7 @@ export const BannerVideo = forwardRef<BannerHandle, BannerProps>(
             playsInline
             controls={false}
             src={videoSrc}
+            aria-label={videoLabel}
           >
             <div className="bg-gray-100 text-gray-500 p-4 rounded-sm text-center">
               Angryman&#8482; says: This device does not support video playback.

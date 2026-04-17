@@ -120,11 +120,16 @@ const WallpaperTable = () => {
         </div>
       </div>
       {selectedWallpaper && (
-        <Modal {...modalDimensions} onClose={handleCloseModal}>
+        <Modal
+          {...modalDimensions}
+          onClose={handleCloseModal}
+          label={`${selectedWallpaper.name} – ${selectedWallpaper.size} wallpaper`}
+        >
           <div className="h-full flex flex-col">
             {modalEnabled && (
               <h2
                 className={`text-center font-bold uppercase ${textSizeClass} mb-4 text-accent-primary`}
+                aria-hidden="true"
               >
                 {selectedWallpaper.name} - {selectedWallpaper.size}
               </h2>
@@ -132,7 +137,7 @@ const WallpaperTable = () => {
             <div className="flex-1 relative">
               <img
                 src={selectedWallpaper.url}
-                alt={`${selectedWallpaper.name} wallpaper`}
+                alt=""
                 className={modalClass}
                 decoding="async"
               />

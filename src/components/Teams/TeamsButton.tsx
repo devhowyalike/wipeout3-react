@@ -27,14 +27,18 @@ interface TeamsButtonProps {
   iconId: IconId;
   onHover: (teamId: IconId) => void;
   onClick?: (teamId: IconId) => void;
+  ariaLabelSuffix?: string;
 }
 
 const TeamsButtonComponent: React.FC<TeamsButtonProps> = ({
   iconId,
   onHover,
   onClick,
+  ariaLabelSuffix,
 }) => {
   const IconComponent = iconComponents[iconId];
+  const teamName = teamsData.find((t) => t.id === iconId)?.teamName ?? iconId;
+  const ariaLabel = ariaLabelSuffix ? `${teamName} ${ariaLabelSuffix}` : teamName;
 
   const { playHoverSound, playClickSound } = useUISounds();
 
@@ -57,7 +61,7 @@ const TeamsButtonComponent: React.FC<TeamsButtonProps> = ({
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
       onClick={handleClick}
-      tabIndex={0}
+      aria-label={ariaLabel}
       className="focus:outline-hidden focus-visible:ring-2 focus-visible:ring-black inline-flex w-fit"
     >
       <IconComponent />
