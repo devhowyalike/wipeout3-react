@@ -35,6 +35,44 @@ JavaScript-driven animations use `requestAnimationFrame` rather than `setInterva
 
 Heavy or off-screen animations (e.g. the 2097/XL vertical marquee, banner videos) are paused when they leave the viewport via `IntersectionObserver`, freeing compositor resources for on-screen content.
 
+## CRT Filter and the Browser Top Layer
+
+`ScanlineFilter1` renders a fixed-position WebGL2 canvas composited over the page with `mix-blend-mode: multiply`. This works for regular page content, but native `<dialog>` elements opened with `.showModal()` are promoted to the browser's top layer — a separate rendering surface above all other stacking contexts, including fixed-position elements. The root filter canvas is therefore invisible behind an open modal.
+
+To keep the CRT effect consistent across modals, every `BaseDialog` mounts a `FilterOverlays` component as a direct child of the `<dialog>` element. Because the `<dialog>` itself is in the top layer, its children — including the WebGL2 canvas — render there too, correctly overlaying modal content.
+
+### Persistent renderer singleton
+
+The WebGL pipeline is owned by a module-level singleton in `src/components/crtRenderer.ts`. The singleton holds the canvas, the GL2 context, the compiled program, the VAO/buffer, the resize listener, and the RAF loop for the lifetime of the page.
+
+`ScanlineFilter1` is a thin host that calls `attach(host)` on mount and `detach(host)` on unmount. When top-layer ownership transfers between the root overlay and a dialog overlay (or between nested dialogs), React unmounts the old `ScanlineFilter1` and mounts a new one inside the new host. Because the canvas is a single long-lived node, those handoffs are cheap `appendChild` reparents — no context creation, no shader compilation, no program link, and no `WEBGL_lose_context` cycle. A `SettingsModal` + `DiscardConfirmOverlay` open/close round trip, which previously rebuilt the pipeline four times, now reuses the same GL state throughout.
+
+The canvas uses `position: fixed; inset: 0`. Reparenting it into a `<dialog>` keeps it viewport-positioned because none of the current wrappers (`<dialog>`, `<body>`, the portal target) establish a containing block for fixed-position descendants. A comment in `crtRenderer.ts` flags this assumption so it can be re-checked if any ancestor later starts using `transform`, `filter`, `perspective`, or `contain: layout/paint`.
+
+### Context-loss recovery
+
+Unexpected WebGL context loss (driver reset, GPU power-saving, tab restore) used to disable the scanline effect until a full page reload. The singleton now installs both `webglcontextlost` (which calls `preventDefault()` so the browser will restore, stops the RAF loop, and drops references to the now-invalid GL objects) and `webglcontextrestored` (which rebuilds the program + VAO + uniform locations, re-applies the viewport and vignette, and restarts the loop if a host is still attached). The UI recovers automatically.
+
+### Disposal
+
+`crtRenderer.dispose()` performs a full teardown — stops RAF, removes the resize / context-lost / context-restored listeners, deletes the buffer / VAO / program, forces `WEBGL_lose_context`, removes the canvas from the DOM, and clears module state so the next `attach` lazy-inits from scratch. It runs in three situations:
+
+1. **Vite HMR.** `import.meta.hot.dispose(() => dispose())` at the bottom of `crtRenderer.ts` prevents hot updates from stacking orphaned canvases, listeners, and GL contexts.
+2. **Vitest.** Tests call `dispose()` in `afterEach` so singleton state doesn't bleed across specs.
+3. **Option toggle-off.** `detach()` schedules a zero-delay timer that invokes `dispose()` unless a matching `attach()` runs in the same task. A dialog handoff always re-attaches synchronously, so the timer is cancelled; flipping the `scanlineFilter1` option off never re-attaches, so the context is released until the option is re-enabled.
+
+### Preventing double compositing
+
+With a `FilterOverlays` inside every dialog and one at the root (via `CRTEffects`), multiple filter canvases would otherwise be active simultaneously, multiplying the `mix-blend-mode: multiply` darkening and running redundant RAF loops. A module-level dialog stack (`src/hooks/dialogStack.ts`) coordinates which instance is active:
+
+- Each `BaseDialog` registers its id when `useShowModal` calls `.showModal()` (`pushDialog`) and removes it when `useShowModal` calls `.close()` — or on effect cleanup if the component unmounts while still open (`popDialog`). Tying registration to the actual show/close calls, rather than to raw component mount/unmount, keeps the stack aligned with browser top-layer membership even if a future consumer keeps a `BaseDialog` mounted while closed.
+- The root `FilterOverlays` only renders when the stack is empty.
+- A dialog's `FilterOverlays` only renders when that dialog is the top-most entry in the stack.
+
+This guarantees exactly one active filter canvas at any time regardless of how many dialogs are open or nested. The stack is a plain module-level array observed via `useSyncExternalStore`, requiring no React context provider.
+
+The persistence optimisation above is currently specific to `ScanlineFilter1`. `FilterOverlays` still iterates `FILTER_REGISTRY` and drops the inactive branch with `return null`, so any filter added later will pay the full React mount/unmount cost on each handoff unless it adopts the same singleton pattern.
+
 ## Touch Navigation Modes
 
 Menu links on touch devices support two navigation modes, implemented in `src/components/WipeoutLink/WipeoutLink.tsx`.
