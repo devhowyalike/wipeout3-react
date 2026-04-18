@@ -1,4 +1,5 @@
 import { useLayoutEffect, type RefObject } from "react";
+import { popDialog, pushDialog } from "@/hooks/dialogStack";
 
 declare global {
   interface FocusOptions {
@@ -16,6 +17,14 @@ interface UseShowModalOptions {
   initialFocusRef?: RefObject<HTMLElement | null>;
   /** Pass `false` to suppress `:focus-visible` on the initial programmatic focus (e.g. auto-opened modals with no preceding user interaction). */
   focusVisible?: boolean;
+  /**
+   * When provided, registers this id with the shared `dialogStack` on
+   * `showModal()` and removes it on `close()` / unmount. Tying registration
+   * to the actual open/close calls (rather than component mount/unmount)
+   * keeps the stack in sync with browser top-layer membership even if a
+   * consumer later keeps a dialog mounted while closed.
+   */
+  dialogId?: string;
 }
 
 const FOCUSABLE =
@@ -66,7 +75,12 @@ function getInitialFocusTarget(
  */
 export function useShowModal(
   ref: RefObject<HTMLDialogElement | null>,
-  { initialFocus = "dialog", initialFocusRef, focusVisible }: UseShowModalOptions = {},
+  {
+    initialFocus = "dialog",
+    initialFocusRef,
+    focusVisible,
+    dialogId,
+  }: UseShowModalOptions = {},
 ) {
   // `useLayoutEffect` (not `useEffect`) so `showModal()` runs after the DOM
   // commit but *before* the browser paints. With `useEffect`, an auto-opening
@@ -85,6 +99,10 @@ export function useShowModal(
     previousActiveElement?.blur();
 
     dialog.showModal();
+    // Register with the shared dialog stack only after `showModal()` succeeds,
+    // so membership tracks actual top-layer state rather than component
+    // mount lifecycle. Paired with the `popDialog` in cleanup below.
+    if (dialogId !== undefined) pushDialog(dialogId);
 
     // Park focus on the dialog container first so VoiceOver registers the
     // dialog context before we move to a more specific target.
@@ -119,6 +137,9 @@ export function useShowModal(
         activeElement.blur();
       }
       if (dialog.open) dialog.close();
+      // Mirror the `pushDialog` above: drop the entry once the dialog has
+      // left the top layer (or the component unmounts while still open).
+      if (dialogId !== undefined) popDialog(dialogId);
 
       if (previousActiveElement) {
         requestAnimationFrame(() => {
@@ -135,5 +156,5 @@ export function useShowModal(
         });
       }
     };
-  }, [initialFocus, initialFocusRef, focusVisible, ref]);
+  }, [initialFocus, initialFocusRef, focusVisible, ref, dialogId]);
 }
