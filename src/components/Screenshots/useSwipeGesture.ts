@@ -38,6 +38,8 @@ export function useSwipeGesture({
 }: UseSwipeGestureOptions): UseSwipeGestureResult {
   const touchStartXRef = useRef<number | null>(null);
   const touchEndXRef = useRef<number | null>(null);
+  // Intentionally never reset: once the user swipes, the hint is suppressed for
+  // the entire session regardless of how many galleries they subsequently open.
   const hasSwipedRef = useRef(false);
   const isTouchDevice = useRef(
     typeof window !== "undefined" &&
