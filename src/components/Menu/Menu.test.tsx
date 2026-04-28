@@ -84,6 +84,29 @@ function createModalItem(content: ReactElement): MenuItem {
   } as MenuItem;
 }
 
+function captureModalHistorySpies() {
+  const pushStateSpy = vi.spyOn(window.history, "pushState");
+  const backSpy = vi.spyOn(window.history, "back");
+  renderMenu(createModalItem(<TestModal />));
+  openModal();
+  closeModal();
+  return { pushStateSpy, backSpy };
+}
+
+function assertFocusRestoration(content: ReactElement) {
+  window.history.pushState({ idx: 1 }, "", "/game/previews");
+  renderMenu(createModalItem(content));
+  const opener = screen.getByRole("button", { name: "Screenshots" });
+  opener.focus();
+  openModal();
+  expect(document.activeElement).toHaveTextContent("Close dialog");
+  closeModal();
+  act(() => {
+    vi.runAllTimers();
+  });
+  expect(document.activeElement).toBe(opener);
+}
+
 beforeEach(() => {
   vi.useFakeTimers();
   window.history.replaceState(null, "", "/");
@@ -99,28 +122,14 @@ afterEach(() => {
 describe("Menu modal history", () => {
   it("does not push a synthetic entry during in-app navigation", () => {
     window.history.pushState({ idx: 1 }, "", "/game/previews");
-
-    const pushStateSpy = vi.spyOn(window.history, "pushState");
-    const backSpy = vi.spyOn(window.history, "back");
-
-    renderMenu(createModalItem(<TestModal />));
-    openModal();
-    closeModal();
-
+    const { pushStateSpy, backSpy } = captureModalHistorySpies();
     expect(pushStateSpy).not.toHaveBeenCalled();
     expect(backSpy).not.toHaveBeenCalled();
   });
 
   it("falls back to a synthetic entry on the first history entry", () => {
     window.history.replaceState({ idx: 0 }, "", "/game/previews");
-
-    const pushStateSpy = vi.spyOn(window.history, "pushState");
-    const backSpy = vi.spyOn(window.history, "back");
-
-    renderMenu(createModalItem(<TestModal />));
-    openModal();
-    closeModal();
-
+    const { pushStateSpy, backSpy } = captureModalHistorySpies();
     expect(pushStateSpy).toHaveBeenCalledTimes(1);
     expect(backSpy).toHaveBeenCalledTimes(1);
   });
@@ -142,48 +151,14 @@ describe("Menu modal history", () => {
   });
 
   it("returns focus to the opener after the modal closes", () => {
-    window.history.pushState({ idx: 1 }, "", "/game/previews");
-
-    renderMenu(createModalItem(<FocusedTestModal />));
-
-    const opener = screen.getByRole("button", { name: "Screenshots" });
-    opener.focus();
-
-    openModal();
-    expect(document.activeElement).toHaveTextContent("Close dialog");
-
-    closeModal();
-
-    act(() => {
-      vi.runAllTimers();
-    });
-
-    expect(document.activeElement).toBe(opener);
+    assertFocusRestoration(<FocusedTestModal />);
   });
 
   it("returns focus when the modal content is wrapped in suspense", () => {
-    window.history.pushState({ idx: 1 }, "", "/game/previews");
-
-    renderMenu(
-      createModalItem(
-        <Suspense fallback={<div>Loading...</div>}>
-          <FocusedTestModal />
-        </Suspense>,
-      ),
+    assertFocusRestoration(
+      <Suspense fallback={<div>Loading...</div>}>
+        <FocusedTestModal />
+      </Suspense>,
     );
-
-    const opener = screen.getByRole("button", { name: "Screenshots" });
-    opener.focus();
-
-    openModal();
-    expect(document.activeElement).toHaveTextContent("Close dialog");
-
-    closeModal();
-
-    act(() => {
-      vi.runAllTimers();
-    });
-
-    expect(document.activeElement).toBe(opener);
   });
 });

@@ -15,6 +15,17 @@ function pressEscape() {
   fireEvent.keyDown(window, { key: "Escape" });
 }
 
+function dispatchEscapeEvent() {
+  const event = new KeyboardEvent("keydown", {
+    key: "Escape",
+    bubbles: true,
+    cancelable: true,
+  });
+  const preventDefaultSpy = vi.spyOn(event, "preventDefault");
+  window.dispatchEvent(event);
+  return preventDefaultSpy;
+}
+
 describe("EscapeNavigation — stacked escape handling", () => {
   it("invokes the most recently registered handler", () => {
     const handlerA = vi.fn();
@@ -79,15 +90,7 @@ describe("EscapeNavigation — stacked escape handling", () => {
     // With an empty handler stack and a non-home pathname,
     // Escape should call navigate(-1). We verify indirectly by
     // confirming the event was preventDefault'd.
-    const event = new KeyboardEvent("keydown", {
-      key: "Escape",
-      bubbles: true,
-      cancelable: true,
-    });
-    const preventSpy = vi.spyOn(event, "preventDefault");
-    window.dispatchEvent(event);
-
-    expect(preventSpy).toHaveBeenCalled();
+    expect(dispatchEscapeEvent()).toHaveBeenCalled();
   });
 
   it("does nothing when the stack is empty on the home route", () => {
@@ -97,14 +100,6 @@ describe("EscapeNavigation — stacked escape handling", () => {
       </MemoryRouter>,
     );
 
-    const event = new KeyboardEvent("keydown", {
-      key: "Escape",
-      bubbles: true,
-      cancelable: true,
-    });
-    const preventSpy = vi.spyOn(event, "preventDefault");
-    window.dispatchEvent(event);
-
-    expect(preventSpy).not.toHaveBeenCalled();
+    expect(dispatchEscapeEvent()).not.toHaveBeenCalled();
   });
 });

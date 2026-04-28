@@ -3,6 +3,15 @@ import { Headline } from "@/components/Typography/Headline";
 import { useOptions } from "@/hooks/useOptions";
 import { bodyTextClass } from "@/utils/textStyles";
 
+const futureDates = [
+  "10th August - Solar Eclipse Festival - Cornwall UK",
+  "13th August - Edinburgh Castle with Orbital",
+  "14th August - Bologna, Italy",
+  "22nd August - Pacha Club in Ibiza with Sasha",
+  "3rd September - eWorks in Berlin with Paul van Dyk",
+  "9th September - Paris (line up TBC)",
+];
+
 /** Tour page. */
 export default function TourPage() {
   const textClass = bodyTextClass(useOptions().xsText);
@@ -42,12 +51,9 @@ export default function TourPage() {
       </Headline>
       <div className={textClass}>
         <p className={`${textClass} mb-4`}>Further dates are planned across Europe as follows:</p>
-        <p className={textClass}>10th August - Solar Eclipse Festival - Cornwall UK</p>
-        <p className={textClass}>13th August - Edinburgh Castle with Orbital</p>
-        <p className={textClass}>14th August - Bologna, Italy</p>
-        <p className={textClass}>22nd August - Pacha Club in Ibiza with Sasha</p>
-        <p className={textClass}>3rd September - eWorks in Berlin with Paul van Dyk</p>
-        <p className={textClass}>9th September - Paris (line up TBC)</p>
+        {futureDates.map((date) => (
+          <p key={date} className={textClass}>{date}</p>
+        ))}
         <p className={`${textClass} mt-4`}>Also to be confirmed - Greece</p>
       </div>
     </TablePage>
