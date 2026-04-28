@@ -63,9 +63,6 @@ importers:
       babel-plugin-react-compiler:
         specifier: ^1.0.0
         version: 1.0.0
-      baseline-browser-mapping:
-        specifier: ^2.10.0
-        version: 2.10.0
       eslint:
         specifier: ^9.37.0
         version: 9.37.0(jiti@2.6.1)
