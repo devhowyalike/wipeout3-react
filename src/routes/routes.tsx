@@ -3,6 +3,16 @@ import { routeDefinitions } from "./routeDefinitions";
 import { animations } from "@/components/WipeoutLink/animations";
 import Loading from "@/components/Loading";
 import type { RouteConfig } from "@/types/Route.types";
+import { setPrefetchMap } from "@/utils/prefetchRoute";
+import { setRoutesConfig } from "./routesConfigStore";
+
+setPrefetchMap(
+  Object.fromEntries(
+    routeDefinitions
+      .filter((def): def is Extract<typeof def, { load: unknown }> => "load" in def)
+      .map((def) => [def.id, def.load]),
+  ),
+);
 
 /**
  * Fully resolved route configuration array — each entry includes a lazy-loaded
@@ -49,3 +59,5 @@ export const routesConfig: RouteConfig[] = routeDefinitions.map((def) => {
     ...(hasAnimation && { animation: def.id }),
   };
 });
+
+setRoutesConfig(routesConfig);
