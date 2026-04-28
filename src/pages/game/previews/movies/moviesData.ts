@@ -32,12 +32,3 @@ export const movieData: MovieItem[] = [
     height: modalHeight,
   },
 ];
-
-/**
- * Finds a movie entry by its ID.
- *
- * @param id - Movie identifier (e.g. `"portokora"`, `"megamall"`).
- */
-export function getMovieById(id: string): MovieItem | undefined {
-  return movieData.find(movie => movie.id === id);
-}
