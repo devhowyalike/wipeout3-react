@@ -9,11 +9,47 @@ import {
   NavigationDirection,
   UIState,
 } from "../../types/Screenshot.types";
+import { useSwipeGesture, type SwipeDirection } from "./useSwipeGesture";
 import rawScreenshotsData from "./data/screenshots.json";
 
 // Type assertion for imported data
 const screenshotsData: { screenshots: BaseScreenshotSet[] } =
   rawScreenshotsData;
+
+function getTitleCardImage(id: string) {
+  const image = titleCardMap[id as keyof typeof titleCardMap];
+  if (!image) {
+    console.error(`Title card image not found for id: ${id}`);
+  }
+  return image;
+}
+
+function getCounterImage(index: number) {
+  const key = `counter${String(index).padStart(2, "0")}`;
+  if (key in uiMap) return uiMap[key as keyof typeof uiMap];
+  return index <= 9 ? uiMap.counter01 : uiMap.counter12;
+}
+
+function getNavImage(uiState: UIState, swipeDirection: SwipeDirection) {
+  if (uiState.prevHovered || uiState.prevKeyActive || swipeDirection === "prev") {
+    return uiMap.prev;
+  }
+  if (uiState.nextHovered || uiState.nextKeyActive || swipeDirection === "next") {
+    return uiMap.next;
+  }
+  if (uiState.menuHovered) return uiMap.menu_on;
+  return uiMap.menu_off;
+}
+
+function isAnyNavigationActive(uiState: UIState, swipeDirection: SwipeDirection) {
+  return (
+    uiState.prevHovered ||
+    uiState.nextHovered ||
+    uiState.prevKeyActive ||
+    uiState.nextKeyActive ||
+    swipeDirection !== null
+  );
+}
 
 function generateScreenshots(screen: BaseScreenshotSet): Screenshot[] {
   if (!screen.count) return [];
@@ -31,28 +67,12 @@ const ScreenshotGallery = () => {
   const [currentScreenIndex, setCurrentScreenIndex] = useState(0);
   const [currentSectionIndex, setCurrentSectionIndex] = useState(0);
 
-  // Refs for touch handling
-  const touchStartXRef = useRef<number | null>(null);
-  const touchEndXRef = useRef<number | null>(null);
   const galleryRef = useRef<HTMLDivElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
   const viewerHeadingRef = useRef<HTMLSpanElement>(null);
   const shouldFocusViewerRef = useRef(false);
   // Set when navigating back so the useEffect can focus the first menu button.
   const shouldFocusMenuRef = useRef(false);
-
-  // Swipe hint + live drag direction feedback
-  // (pointer: coarse) is true on touch-primary devices (phones/tablets), false on mouse/trackpad
-  // provides a visual hint  that swipe gestures are supported
-  const isTouchDevice = useRef(
-    typeof window !== "undefined" &&
-      window.matchMedia("(pointer: coarse)").matches,
-  );
-  const hasSwipedRef = useRef(false);
-  const [showSwipeHint, setShowSwipeHint] = useState(false);
-  const [swipeDirection, setSwipeDirection] = useState<"prev" | "next" | null>(
-    null,
-  );
 
   // UI state
   const [uiState, setUIState] = useState<UIState>({
@@ -160,45 +180,12 @@ const ScreenshotGallery = () => {
     handleNavigation("next");
   };
 
-  // Touch Event Handlers for swipe gestures
-  const handleTouchStart = (e: React.TouchEvent) => {
-    touchStartXRef.current = e.touches[0].clientX;
-    touchEndXRef.current = null;
-    hasSwipedRef.current = true;
-    setShowSwipeHint(false);
-  };
-
-  const handleTouchMove = (e: React.TouchEvent) => {
-    touchEndXRef.current = e.touches[0].clientX;
-    if (touchStartXRef.current !== null) {
-      const delta = e.touches[0].clientX - touchStartXRef.current;
-      if (Math.abs(delta) > 8) {
-        setSwipeDirection(delta > 0 ? "prev" : "next");
-      }
-    }
-  };
-
-  const handleTouchEnd = () => {
-    if (!touchStartXRef.current || !touchEndXRef.current) {
-      setSwipeDirection(null);
-      return;
-    }
-
-    const swipeDistance = touchEndXRef.current - touchStartXRef.current;
-    const minSwipeDistance = 50;
-
-    if (Math.abs(swipeDistance) >= minSwipeDistance) {
-      if (swipeDistance > 0) {
-        handleNavigation("prev");
-      } else {
-        handleNavigation("next");
-      }
-    }
-
-    touchStartXRef.current = null;
-    touchEndXRef.current = null;
-    setSwipeDirection(null);
-  };
+  const { swipeDirection, showSwipeHint, handleTouchStart, handleTouchMove, handleTouchEnd } =
+    useSwipeGesture({
+      onSwipe: handleNavigation,
+      hintTrigger: currentScreen?.id ?? null,
+      enableHints: swipeHints,
+    });
 
   // Keyboard event handler
   useEffect(() => {
@@ -275,76 +262,6 @@ const ScreenshotGallery = () => {
     return () => window.clearTimeout(focusTimer);
   }, [currentScreen]);
 
-  const currentScreenId = currentScreen?.id;
-
-  // Show swipe hint whenever user opens a screenshot set (touch devices only, not during active swiping)
-  useEffect(() => {
-    if (
-      currentScreenId == null ||
-      !isTouchDevice.current ||
-      hasSwipedRef.current ||
-      !swipeHints
-    )
-      return;
-    setShowSwipeHint(true);
-    const timer = setTimeout(() => setShowSwipeHint(false), 2500);
-    return () => clearTimeout(timer);
-  }, [currentScreenId, swipeHints]);
-
-  // Determine if any navigation action is active
-  const isAnyNavigationActive = () => {
-    return (
-      uiState.prevHovered ||
-      uiState.nextHovered ||
-      uiState.prevKeyActive ||
-      uiState.nextKeyActive ||
-      swipeDirection !== null
-    );
-  };
-
-  // Get title card image
-  const getTitleCardImage = (id: string) => {
-    const image = titleCardMap[id as keyof typeof titleCardMap];
-    if (!image) {
-      console.error(`Title card image not found for id: ${id}`);
-    }
-    return image;
-  };
-
-  // Get counter image
-  const getCounterImage = (index: number) => {
-    const paddedIndex = String(index).padStart(2, "0");
-    const key = `counter${paddedIndex}`;
-
-    // Use type assertion to check if the key exists in uiMap
-    if (key in uiMap) {
-      return uiMap[key as keyof typeof uiMap];
-    }
-
-    // Return a default counter if the specific one doesn't exist
-    return index <= 9 ? uiMap.counter01 : uiMap.counter12;
-  };
-
-  // Get UI nav image based on state
-  const getNavImage = () => {
-    if (
-      uiState.prevHovered ||
-      uiState.prevKeyActive ||
-      swipeDirection === "prev"
-    ) {
-      return uiMap.prev;
-    } else if (
-      uiState.nextHovered ||
-      uiState.nextKeyActive ||
-      swipeDirection === "next"
-    ) {
-      return uiMap.next;
-    } else if (uiState.menuHovered) {
-      return uiMap.menu_on;
-    } else {
-      return uiMap.menu_off;
-    }
-  };
 
   // Main menu view
   if (!currentScreen) {
@@ -460,8 +377,8 @@ const ScreenshotGallery = () => {
         </div>
         <div>
           <img
-            src={isAnyNavigationActive() ? uiMap.arrow_up : uiMap.arrow_down}
-            alt={isAnyNavigationActive() ? "Up arrow" : "Down arrow"}
+            src={isAnyNavigationActive(uiState, swipeDirection) ? uiMap.arrow_up : uiMap.arrow_down}
+            alt={isAnyNavigationActive(uiState, swipeDirection) ? "Up arrow" : "Down arrow"}
           />
         </div>
         <div>
@@ -517,7 +434,7 @@ const ScreenshotGallery = () => {
               onFocus={() => handleMenuHover(true)}
               onBlur={() => handleMenuHover(false)}
             >
-              <img src={getNavImage()} alt="" />
+              <img src={getNavImage(uiState, swipeDirection)} alt="" />
             </button>
           </div>
         </div>
