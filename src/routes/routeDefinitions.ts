@@ -33,7 +33,7 @@ type MailtoDef = {
 };
 
 /** Discriminated union covering the three kinds of route: page, modal, and mailto. */
-export type RouteDefinition = PageDef | ModalDef | MailtoDef;
+type RouteDefinition = PageDef | ModalDef | MailtoDef;
 
 /**
  * Canonical route table — every route is defined once here (id, label, path, and import factory).

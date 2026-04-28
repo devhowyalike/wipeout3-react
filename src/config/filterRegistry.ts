@@ -1,7 +1,7 @@
 import { type ComponentType, lazy } from "react";
 import type { OptionKey } from "@/config/options";
 
-export interface FilterRegistryEntry {
+interface FilterRegistryEntry {
   /** Option key that gates this filter — the filter only renders when the option is `true`. */
   option: OptionKey;
   /** Lazy-loaded filter component. */

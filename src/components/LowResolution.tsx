@@ -5,7 +5,7 @@ import { BREAKPOINT_MD } from "@/config/constants";
 export const CRT_WIDTH = 800;
 export const CRT_HEIGHT = 600;
 
-export type LowResolutionMetrics = {
+type LowResolutionMetrics = {
   scale: number;
   height: number;
 };

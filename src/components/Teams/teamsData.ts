@@ -1,5 +1,5 @@
 /** Shape of a single team entry with navigation paths for the team page and screensaver. */
-export interface TeamsData {
+interface TeamsData {
   id: string;
   teamName: string;
   route: string;

@@ -108,7 +108,7 @@ export interface PersistentFilterRendererConfig<U> {
   canvasStyle?: Partial<CSSStyleDeclaration>;
 }
 
-export interface PersistentFilterRenderer {
+interface PersistentFilterRenderer {
   /**
    * Attach the canvas to `host`. Lazily initialises on first call, then
    * reparents on subsequent calls (no GL rebuild).

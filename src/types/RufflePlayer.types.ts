@@ -8,7 +8,7 @@ declare global {
 }
 
 /** Configuration object that Ruffle reads from `window.RufflePlayer.config`. */
-export interface RuffleWindowConfig {
+interface RuffleWindowConfig {
   allowScriptAccess?: boolean;
   base?: string;
   autoplay?: string;
@@ -28,7 +28,7 @@ export interface RuffleInstance {
 }
 
 /** Factory returned by `RuffleInstance.newest()` for creating player elements. */
-export interface RuffleConstructor {
+interface RuffleConstructor {
   createPlayer: () => RufflePlayerElement;
 }
 
@@ -67,7 +67,7 @@ export interface RuffleConfig {
 }
 
 /** Options passed to `RufflePlayerElement.load()` when loading a SWF file. */
-export interface RuffleLoadOptions {
+interface RuffleLoadOptions {
   url: string;
   autoplay?: boolean;
   backgroundColor?: string;

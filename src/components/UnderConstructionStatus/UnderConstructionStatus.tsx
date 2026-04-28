@@ -7,7 +7,7 @@ const DEFAULT_BODY_AFTER = "RETURN FOR FULL ARCHIVE DROP.";
 const DEFAULT_BODY =
   "SECTION MARKUP IN PROGRESS. ASSETS STAGED. COPY UNDER REVIEW. ACCOMPANYING GRAPHIC(S) / CHARACTER IN PRODUCTION. SPEED/MOTION STRIPES BEING TESTED. PACKAGING LAYOUT ASSESSED.";
 
-export type UnderConstructionStatusProps = {
+type UnderConstructionStatusProps = {
   title?: string;
   date?: string;
   statusLine?: string;

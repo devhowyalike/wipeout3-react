@@ -9,4 +9,3 @@ interface OptionsContextType {
 const OptionsContext = createContext<OptionsContextType | undefined>(undefined);
 
 export { OptionsContext };
-export type { OptionsContextType };
