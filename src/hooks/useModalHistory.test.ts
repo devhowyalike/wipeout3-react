@@ -23,14 +23,52 @@ function renderModalHistory(isOpen: boolean, onClose = vi.fn()) {
   };
 }
 
+function prepareModal(trigger: HTMLButtonElement) {
+  const hook = renderModalHistory(false);
+  act(() => hook.result.current.prepareOpen(trigger));
+  return hook;
+}
+
+function openModal(trigger: HTMLButtonElement) {
+  const hook = prepareModal(trigger);
+  hook.rerender({ isOpen: true, onClose: hook.onClose });
+  return hook;
+}
+
+function firePopstate() {
+  act(() => {
+    window.dispatchEvent(new PopStateEvent("popstate"));
+  });
+}
+
+function appendTrigger(textContent?: string) {
+  const trigger = document.createElement("button");
+  if (textContent) trigger.textContent = textContent;
+  document.body.appendChild(trigger);
+  return trigger;
+}
+
+function spyAndRequestClose(trigger: HTMLButtonElement) {
+  const backSpy = vi.spyOn(window.history, "back");
+  const { result } = openModal(trigger);
+  act(() => result.current.requestClose());
+  return backSpy;
+}
+
+function spyAndFirePopstate(trigger: HTMLButtonElement) {
+  const forwardSpy = vi.spyOn(window.history, "forward");
+  const { onClose } = openModal(trigger);
+  firePopstate();
+  return { onClose, forwardSpy };
+}
+
 describe("useModalHistory", () => {
   describe("intercept mode (in-app navigation, idx > 0)", () => {
     let trigger: HTMLButtonElement;
 
     beforeEach(() => {
       window.history.pushState({ idx: 1 }, "", "/game/previews");
-      trigger = document.createElement("button");
-      document.body.appendChild(trigger);
+      trigger = appendTrigger();
     });
 
     afterEach(() => {
@@ -39,50 +77,28 @@ describe("useModalHistory", () => {
 
     it("does not push a synthetic history entry", () => {
       const pushSpy = vi.spyOn(window.history, "pushState");
-      const { result } = renderModalHistory(false);
-      act(() => result.current.prepareOpen(trigger));
+      prepareModal(trigger);
       expect(pushSpy).not.toHaveBeenCalled();
     });
 
     it("does not call history.back on requestClose", () => {
-      const backSpy = vi.spyOn(window.history, "back");
-      const { result, rerender, onClose } = renderModalHistory(false);
-      act(() => result.current.prepareOpen(trigger));
-      rerender({ isOpen: true, onClose });
-      act(() => result.current.requestClose());
-      expect(backSpy).not.toHaveBeenCalled();
+      expect(spyAndRequestClose(trigger)).not.toHaveBeenCalled();
     });
 
     it("closes and calls forward() on popstate", () => {
-      const forwardSpy = vi.spyOn(window.history, "forward");
-      const { result, rerender, onClose } = renderModalHistory(false);
-      act(() => result.current.prepareOpen(trigger));
-      rerender({ isOpen: true, onClose });
-
-      act(() => {
-        window.dispatchEvent(new PopStateEvent("popstate"));
-      });
-
+      const { onClose, forwardSpy } = spyAndFirePopstate(trigger);
       expect(onClose).toHaveBeenCalledTimes(1);
       expect(forwardSpy).toHaveBeenCalledTimes(1);
     });
 
     it("ignores the popstate caused by its own forward() call", () => {
-      const { result, rerender, onClose } = renderModalHistory(false);
-      act(() => result.current.prepareOpen(trigger));
-      rerender({ isOpen: true, onClose });
-
-      act(() => {
-        window.dispatchEvent(new PopStateEvent("popstate"));
-      });
+      const { rerender, onClose } = openModal(trigger);
+      firePopstate();
       expect(onClose).toHaveBeenCalledTimes(1);
 
       onClose.mockClear();
       rerender({ isOpen: true, onClose });
-
-      act(() => {
-        window.dispatchEvent(new PopStateEvent("popstate"));
-      });
+      firePopstate();
       expect(onClose).not.toHaveBeenCalled();
     });
   });
@@ -92,8 +108,7 @@ describe("useModalHistory", () => {
 
     beforeEach(() => {
       window.history.replaceState({ idx: 0 }, "", "/game/previews");
-      trigger = document.createElement("button");
-      document.body.appendChild(trigger);
+      trigger = appendTrigger();
     });
 
     afterEach(() => {
@@ -102,30 +117,16 @@ describe("useModalHistory", () => {
 
     it("pushes a synthetic history entry on prepareOpen", () => {
       const pushSpy = vi.spyOn(window.history, "pushState");
-      const { result } = renderModalHistory(false);
-      act(() => result.current.prepareOpen(trigger));
+      prepareModal(trigger);
       expect(pushSpy).toHaveBeenCalledWith({ modal: true }, "");
     });
 
     it("calls history.back on requestClose to pop the synthetic entry", () => {
-      const backSpy = vi.spyOn(window.history, "back");
-      const { result, rerender, onClose } = renderModalHistory(false);
-      act(() => result.current.prepareOpen(trigger));
-      rerender({ isOpen: true, onClose });
-      act(() => result.current.requestClose());
-      expect(backSpy).toHaveBeenCalledTimes(1);
+      expect(spyAndRequestClose(trigger)).toHaveBeenCalledTimes(1);
     });
 
     it("closes on popstate without calling forward()", () => {
-      const forwardSpy = vi.spyOn(window.history, "forward");
-      const { result, rerender, onClose } = renderModalHistory(false);
-      act(() => result.current.prepareOpen(trigger));
-      rerender({ isOpen: true, onClose });
-
-      act(() => {
-        window.dispatchEvent(new PopStateEvent("popstate"));
-      });
-
+      const { onClose, forwardSpy } = spyAndFirePopstate(trigger);
       expect(onClose).toHaveBeenCalledTimes(1);
       expect(forwardSpy).not.toHaveBeenCalled();
     });
@@ -136,9 +137,7 @@ describe("useModalHistory", () => {
 
     beforeEach(() => {
       window.history.pushState({ idx: 1 }, "", "/game/previews");
-      trigger = document.createElement("button");
-      trigger.textContent = "Open";
-      document.body.appendChild(trigger);
+      trigger = appendTrigger("Open");
     });
 
     afterEach(() => {
@@ -147,10 +146,7 @@ describe("useModalHistory", () => {
 
     it("restores focus to the trigger element on requestClose", () => {
       trigger.focus();
-
-      const { result, rerender, onClose } = renderModalHistory(false);
-      act(() => result.current.prepareOpen(trigger));
-      rerender({ isOpen: true, onClose });
+      const { result } = openModal(trigger);
 
       const other = document.createElement("input");
       document.body.appendChild(other);
@@ -167,17 +163,11 @@ describe("useModalHistory", () => {
     });
 
     it("restores focus on popstate-triggered close", () => {
-      const { result, rerender, onClose } = renderModalHistory(false);
-      act(() => result.current.prepareOpen(trigger));
-      rerender({ isOpen: true, onClose });
-
-      act(() => {
-        window.dispatchEvent(new PopStateEvent("popstate"));
-      });
+      openModal(trigger);
+      firePopstate();
       act(() => {
         vi.runAllTimers();
       });
-
       expect(document.activeElement).toBe(trigger);
     });
   });
