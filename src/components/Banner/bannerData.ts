@@ -1,5 +1,5 @@
 /** Identifier and display name for a team banner animation. */
-export interface BannerItem {
+interface BannerItem {
   id: string;
   name: string;
 }

@@ -1,30 +1,18 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
 import Page from "@/components/Page";
 import { Headline } from "@/components/Typography/Headline";
 import { TeamsLogos } from "@/components/Teams/TeamsLogos";
-import { teamsData } from "@/components/Teams/teamsData";
-import { prefetchRoute } from "@/utils/prefetchRoute";
+import { useTeamHeaderNav } from "@/hooks/useTeamHeaderNav";
 
 const PAGE_TITLE = "Scr:Savers";
 
 /** Screensavers download page. */
 const ScreenSaversPage: React.FC = () => {
-  const [headerText, setHeaderText] = React.useState(PAGE_TITLE);
-  const navigate = useNavigate();
-
-  const handleTeamHover = (teamId: string) => {
-    const team = teamsData.find((team) => team.id === teamId);
-    setHeaderText(team ? team.teamName : PAGE_TITLE);
-    if (team) prefetchRoute(`${team.id}Screensaver`);
-  };
-
-  const handleTeamClick = (teamId: string) => {
-    const team = teamsData.find((team) => team.id === teamId);
-    if (team) {
-      navigate(team.screenSaver);
-    }
-  };
+  const { headerText, handleTeamHover, handleTeamClick } = useTeamHeaderNav({
+    defaultTitle: PAGE_TITLE,
+    getNavigatePath: (team) => team.screenSaver,
+    getPrefetchKey: (team) => `${team.id}Screensaver`,
+  });
 
   return (
     <Page

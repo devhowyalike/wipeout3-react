@@ -159,12 +159,3 @@ export const createInvisiblePlayer = async (
     console.error("Error creating invisible Ruffle player:", playerError);
   }
 };
-
-/**
- * Resets the Ruffle loading state - mainly for testing purposes
- */
-export const resetRuffleLoadState = (): void => {
-  ruffleLoadPromise = null;
-  wasmPreloaded = false;
-  console.log("Ruffle loading state has been reset");
-};

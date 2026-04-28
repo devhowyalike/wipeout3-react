@@ -1,5 +1,5 @@
 /** Map of resolution label to download URL for a wallpaper. */
-export interface WallpaperSize {
+interface WallpaperSize {
   [key: string]: string;
 }
 

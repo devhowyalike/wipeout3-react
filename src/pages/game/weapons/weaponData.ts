@@ -9,23 +9,6 @@ export interface Weapon {
   desc: string;
 }
 
-/** Background icon definition for a weapon category (Defensive / Offensive). */
-export interface WeaponBackground {
-  type: 'Defensive' | 'Offensive';
-  icon: string;
-}
-
-/** Background icon definitions for the Defensive and Offensive weapon categories. */
-export const weaponBackgrounds: WeaponBackground[] = [
-  {
-    type: 'Defensive',
-    icon: 'defensive.svg'
-  },
-  {
-    type: 'Offensive',
-    icon: 'offensive.svg'
-  }
-];
 
 /**
  * Full weapon roster with names, sound files, icons, categories, and

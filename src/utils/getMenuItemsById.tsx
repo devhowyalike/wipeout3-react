@@ -1,5 +1,5 @@
 import { getRouteAnimation } from "@/routes/getRouteAnimation";
-import { routesConfig } from "@/routes/routes";
+import { getRoutesConfig } from "@/routes/routesConfigStore";
 import type { RouteId } from "@/routes/Route.Ids";
 import type { RouteConfig } from "@/types/Route.types";
 
@@ -11,7 +11,8 @@ import type { RouteConfig } from "@/types/Route.types";
  * @throws If `routesConfig` is uninitialized or any ID is not found.
  */
 export function getMenuItemsById(ids: RouteId[]) {
-  if (!routesConfig) {
+  const routesConfig = getRoutesConfig();
+  if (!routesConfig.length) {
     throw new Error("routesConfig is not initialized");
   }
 

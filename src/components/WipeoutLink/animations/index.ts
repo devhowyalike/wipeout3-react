@@ -5,7 +5,7 @@ import { gameAnimations } from "./game";
 import { previewsAnimations } from "./previews";
 import { pitlaneAnimations } from "./pitlane";
 
-export type { VideoSource, Animation } from "./types";
+export type { Animation } from "./types";
 export { createVideoSources, makeAnimations } from "./utils";
 export { getMovieAnimation } from "./movies";
 

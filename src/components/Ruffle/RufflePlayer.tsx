@@ -5,8 +5,22 @@ import {
   forwardRef,
   useState,
 } from "react";
-import { RufflePlayerProps, RufflePlayerElement } from "@/types/RufflePlayer.types";
+import {
+  RufflePlayerProps,
+  RufflePlayerElement,
+} from "@/types/RufflePlayer.types";
 import { loadRuffle } from "./ruffleUtils";
+
+function destroyPlayerRef(playerRef: { current: RufflePlayerElement | null }) {
+  if (playerRef.current && typeof playerRef.current.destroy === "function") {
+    try {
+      playerRef.current.destroy();
+    } catch (err) {
+      console.warn("Error destroying Ruffle player:", err);
+    }
+  }
+  playerRef.current = null;
+}
 
 /** Imperative handle: clears the container and destroys the Ruffle instance when present. */
 export interface RufflePlayerHandle {
@@ -26,7 +40,7 @@ const RufflePlayer = forwardRef<RufflePlayerHandle, RufflePlayerProps>(
       autoplay = true,
       aspectRatio = 16 / 9,
     },
-    ref
+    ref,
   ) => {
     const containerRef = useRef<HTMLDivElement>(null);
     const playerInstanceRef = useRef<RufflePlayerElement | null>(null);
@@ -38,20 +52,7 @@ const RufflePlayer = forwardRef<RufflePlayerHandle, RufflePlayerProps>(
         if (containerRef.current) {
           containerRef.current.innerHTML = "";
         }
-
-        // If there's a player instance with a destroy method, call it
-        if (
-          playerInstanceRef.current &&
-          typeof playerInstanceRef.current.destroy === "function"
-        ) {
-          try {
-            playerInstanceRef.current.destroy();
-          } catch (err) {
-            console.warn("Error destroying Ruffle player:", err);
-          }
-        }
-
-        playerInstanceRef.current = null;
+        destroyPlayerRef(playerInstanceRef);
       },
     }));
 
@@ -123,20 +124,7 @@ const RufflePlayer = forwardRef<RufflePlayerHandle, RufflePlayerProps>(
         if (container) {
           container.innerHTML = "";
         }
-
-        // Also destroy the player instance if it exists
-        if (
-          playerInstanceRef.current &&
-          typeof playerInstanceRef.current.destroy === "function"
-        ) {
-          try {
-            playerInstanceRef.current.destroy();
-          } catch (err) {
-            console.warn("Error destroying Ruffle player:", err);
-          }
-        }
-
-        playerInstanceRef.current = null;
+        destroyPlayerRef(playerInstanceRef);
       };
     }, [swfPath, autoplay]);
 
@@ -153,7 +141,7 @@ const RufflePlayer = forwardRef<RufflePlayerHandle, RufflePlayerProps>(
         }}
       />
     );
-  }
+  },
 );
 
 RufflePlayer.displayName = "RufflePlayer";

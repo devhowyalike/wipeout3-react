@@ -33,13 +33,16 @@ afterEach(() => {
   cleanup();
 });
 
+function expectRootFilterInstance() {
+  const instances = screen.queryAllByTestId("filter-instance");
+  expect(instances).toHaveLength(1);
+  expect(instances[0].closest("dialog")).toBeNull();
+}
+
 describe("FilterOverlays — dialog stack exclusivity", () => {
   it("renders exactly one instance at the root when no dialog is open", () => {
     render(<FilterOverlays />, { wrapper: Providers });
-
-    const instances = screen.queryAllByTestId("filter-instance");
-    expect(instances).toHaveLength(1);
-    expect(instances[0].closest("dialog")).toBeNull();
+    expectRootFilterInstance();
   });
 
   it("yields the root and activates inside the dialog when one opens", () => {
@@ -125,10 +128,7 @@ describe("FilterOverlays — dialog stack exclusivity", () => {
     ).not.toBeNull();
 
     rerender(<App showDialog={false} />);
-
-    const instances = screen.queryAllByTestId("filter-instance");
-    expect(instances).toHaveLength(1);
-    expect(instances[0].closest("dialog")).toBeNull();
+    expectRootFilterInstance();
   });
 
   it("renders nothing if the option is disabled", () => {

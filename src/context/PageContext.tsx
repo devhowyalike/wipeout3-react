@@ -20,4 +20,3 @@ interface PageContextType {
 const PageContext = createContext<PageContextType | undefined>(undefined);
 
 export { PageContext };
-export type { PageContextType };

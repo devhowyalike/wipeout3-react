@@ -25,6 +25,43 @@ function getAncestorPrefix(el: Element): string | null {
 }
 
 /**
+ * Attempts to restore focus to the previously-active element for a POP
+ * navigation. Tries the live element reference first, then falls back to a
+ * scoped CSS selector. Returns `true` when focus was successfully placed.
+ */
+function tryRestorePopFocus(
+  container: HTMLElement,
+  record: FocusRecord | undefined,
+): boolean {
+  if (!record) return false;
+  if (record.element.isConnected) {
+    (record.element as HTMLElement).focus({ preventScroll: true });
+    return true;
+  }
+  if (record.selector) {
+    const target =
+      container.querySelector<HTMLElement>(record.selector) ??
+      document.querySelector<HTMLElement>(record.selector);
+    if (target) {
+      target.focus({ preventScroll: true });
+      return true;
+    }
+  }
+  return false;
+}
+
+/** Moves focus to the first `<h1>` in `container`, or the container itself. */
+function focusPageHeading(container: HTMLElement): void {
+  const h1 = container.querySelector<HTMLElement>("h1");
+  if (h1) {
+    if (!h1.hasAttribute("tabindex")) h1.setAttribute("tabindex", "-1");
+    h1.focus({ preventScroll: true });
+  } else {
+    container.focus({ preventScroll: true });
+  }
+}
+
+/**
  * Builds a CSS selector that can re-identify `el` after a remount.
  * Scoped to the nearest identifiable ancestor when possible so that
  * duplicate hrefs in different page regions don't collide.
@@ -87,29 +124,9 @@ export function useRouteChangeFocus(
 
     if (navigationType === "POP") {
       const record = focusMapRef.current.get(pathname);
-      if (record) {
-        if (record.element.isConnected) {
-          (record.element as HTMLElement).focus({ preventScroll: true });
-          return;
-        }
-        if (record.selector) {
-          const target =
-            container.querySelector<HTMLElement>(record.selector) ??
-            document.querySelector<HTMLElement>(record.selector);
-          if (target) {
-            target.focus({ preventScroll: true });
-            return;
-          }
-        }
-      }
+      if (tryRestorePopFocus(container, record)) return;
     }
 
-    const h1 = container.querySelector<HTMLElement>("h1");
-    if (h1) {
-      if (!h1.hasAttribute("tabindex")) h1.setAttribute("tabindex", "-1");
-      h1.focus({ preventScroll: true });
-    } else {
-      container.focus({ preventScroll: true });
-    }
+    focusPageHeading(container);
   }, [pathname, navigationType]); // eslint-disable-line react-hooks/exhaustive-deps -- containerRef is a stable ref
 }

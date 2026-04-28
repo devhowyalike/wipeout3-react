@@ -2,10 +2,10 @@ import { useCallback, useEffect, useState, type ReactNode } from "react";
 import { useOptions } from "@/hooks/useOptions";
 import { BREAKPOINT_MD } from "@/config/constants";
 
-export const CRT_WIDTH = 800;
-export const CRT_HEIGHT = 600;
+const CRT_WIDTH = 800;
+const CRT_HEIGHT = 600;
 
-export type LowResolutionMetrics = {
+type LowResolutionMetrics = {
   scale: number;
   height: number;
 };

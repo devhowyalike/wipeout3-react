@@ -5,6 +5,7 @@ import sitemap from 'vite-plugin-sitemap';
 import path from 'path';
 import { readFileSync } from 'node:fs';
 import { visualizer } from 'rollup-plugin-visualizer';
+import reactCompiler from 'babel-plugin-react-compiler';
 
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), 'VITE_');
@@ -118,9 +119,7 @@ export default defineConfig(({ mode }) => {
       tailwindcss(),
       react({
         babel: {
-          plugins: [
-            "babel-plugin-react-compiler"
-          ],
+          plugins: [reactCompiler],
         },
       }),
       removeEmptyCSSVars(),

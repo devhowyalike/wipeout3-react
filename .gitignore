@@ -61,3 +61,6 @@ logs
 
 # React router
 /.react-router
+
+# Fallow
+.fallow/
